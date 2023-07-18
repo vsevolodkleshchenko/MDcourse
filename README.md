@@ -6,7 +6,7 @@
 1. [Уравнения движения.](lectures/lecture1/lecture1.md)
 
 ## Практика
-1. [Моделирование в HOOMD-blue. Распределение скоростей.](https://nbviewer.jupyter.org/urls/vsevolodkleshchenko.github.io/MDcourse/practice/MD_tutorial_and_velocity_distributions.ipynb)
+1. [Моделирование в HOOMD-blue. Распределение скоростей.](https://nbviewer.org/github/vsevolodkleshchenko/MDcourse/blob/main/practice/MD_tutorial_and_velocity_distributions.ipynb)
 
 ## Список литературы
 1. D. Frenkel, B. Smit, Understanding Molecular Simulation, 2nd Edition, Academic Press, New York, 2001.
