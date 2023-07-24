@@ -1,102 +1,103 @@
-# Лекция 1
+# Lecture 1
 
-Рассмотрим систему из большого числа частиц и построим аппарат для численного моделироования ее динамики.
+Let's consider a system of a large number of particles and build a model for numerical simulation of its dynamics.
 
-## Общая постановка задачи
+![Particles](images/fig0_particles.svg)
 
-Далее, мы будем рассматривать физическую систему
-- без квантовых эффектов:
+## General statement of the problem
+
+Next, we will consider the physical system
+- without quantum effects:
 $h\nu < kT$
-- с количеством частиц $N > 3$
+- with a large number of particles $N > 3$
 
-Для определения системы необходимо задать:
-- размер, тип и другие параметры частиц
-- функцию энергии $U(r)$
+To define the system, it is neccecary to specify:
+- size, type and other parameters of particles
+- energy function $U(r)$
 
-Далее, с помощью методов молеклярной динамики (MD) определяются зависимости координаты и скорости $x(t), v(t)$ частиц, и после производится необходимый анализ.
+Further, using molecular dynamics methods, the dependences of the coordinates and velocities of $x(t), v(t)$ particles are determined, and then the necessary analysis is performed.
 
-### Теоретический подход
-Рассматриваемые системы описываются в терминах Гамильтоновой механики с Гамильтонианом $H$, зависиящим от координат частиц $q$ и импульсов $p$:
+### Theoretical approach
+The systems under consideration are described in terms of Hamiltonian mechanics with the Hamiltonian $H$ depending on the coordinates of the particles $q$ and the momentum $p$:
 
 $$
 H(x) = H(q, p) = E
 $$
 
-Здесь $E$ - энергия системы, которая в Гамильтоновой механике считается постоянной. При этом система задается:
-- Количество частиц $N$
-- Объем системы $V$
-- Гамильтониан $H(q, p)$
+Here $E$ is the energy of the system, which is considered constant in Hamiltonian mechanics. In this case , the system is set:
+- Number of particles $N$
+- System volume $V$
+- Hamiltonian $H(q, p)$
 
-Эта система с размерностью $6N-3$ эволюционирует по совим законам движения, которые задают траекторию в фазовом пространстве
+This system with dimension $6 N-3$ evolves according to its own laws of motion, which define the trajectory in phase space
 
 $$
 \dot q_{\alpha} = \frac{\partial H}{\partial p_{\alpha}} \quad
 \dot p_{\alpha} = - \frac{\partial H}{\partial q_{\alpha}}
 $$
 
-<!-- ![Фазовое простраснство](/images/phase_space-1.png) -->
+![Phase space](images/fig1_phase_space.svg)
 
-Обычно, в ходе анализа, из уже известной траектории движения хочется получить среднее значение какой-либо величины $a(x)$, где $x = (q, p)$, например температуры, давления, энергии взаимодействия и т.д.
+Usually, during the analysis, from an already known trajectory of motion, one wants to get the average value of some value $a(x)$ (temperature, pressure, interaction energy, etc.), where $x = (q, p)$.
 
-Для этого необходимо проинтегрировать величину $a(x)$ с некоторым распределением $P(x)$ и учесть нормировку.
+To do this, it is necessary to integrate the value $a(x)$ with some distribution $P(x)$ and take into account the normalization.
 
 $$
 \left<a(x)\right> = \frac{\int dx \, a(x) P(x)}{\int dx \, P(x)} = 
 \frac{\int dx \, a(x) \delta (H(x) - E)}{\int dx \, \delta (H(x) - E)}
 $$
 
-Однако вычисление этих интегралов является сложной задачей, при этом необходимо знать все занчения для заданной энергии в $6N-3$ - мерном пространстве.
+However, calculating these integrals is a difficult task, and it is necessary to know all the values for a given energy in $(6N-3)$ - dimensional space.
 
-С другой стороны, в предположении эргодичности верно, что среднее значения величины $a(x)$ по распределению равно среднему значению этой величины по траектории, поэтому оно может быть вычисленно с помощью следующего интеграла:
+
+On the other hand, under the assumption of ergodicity, it is true that the mean value of $a$ over the distribution is equal to the average value of this value over the trajectory, so it can be calculated using the following integral:
 
 $$ 
 \left<a(x)\right>=\lim_{T \rightarrow \infty} \frac{1}{T} \int_0^T dt \, a(x(t)) 
 $$
 
-Для вычисления исходных интегралов используется метод Монте-Карло, а в молекулярной динамике для вычисления среднего значения величины используются интегралы последнего вида.
+To calculate the initial integrals, the Monte Carlo method is used, and in molecular dynamics, integrals of the last type are used to calculate the average value of $a$.
 
-### Как перейти к численному решению?
+### How to proceed to the numerical solution?
 
-При решении задачи молекулярной динамики, после задания начального состояния системы $x_0 = (q_0, p_0)$, выполняется численное решение уравнений движения, благодрая чему становится возможным численно дать оценку описанным выше интегралам.
+When solving the problem of molecular dynamics, after setting the initial state of the system $x_0 = (q_0, p_0)$, a numerical solution of the equations of motion is performed, thanks to which it becomes possible to numerically evaluate the integrals described above.
 
-Обозначив шаги по времени $n = 0 \dots M$, соответсвующие временам $t = 0, \Delta t, 2 \Delta t, \dots$, исходный интеграл может быть представлен как среднее значение по всем шагам
+Denoting the time steps with $n = 0\dots M$ corresponding to the times $t = 0, \Delta t, 2\Delta t, \dots$, the original integral can be represented as the average value over all the steps
 
 $$
 \left<a\right> = \frac{1}{M} \sum_{n=0}^{M}a(x(n\Delta t))
 $$
 
-Однако необходимо следить за тем, чтобы проход по пространству был достаточным, для вычисления среднего значения и не возникло проблем, связанных с эргодичнсотью, таких как:
-- наличие барьеров, в которых энергия больше чем в начальный момент времени: $ U(x) > E$, из-за чего образовываются изолированные участки в фазовом пространстве.
-- отсутсвие сходимости при вычислении среднего значения, из-за чего при вычислении на большом количестве точек не происходит достижения константного значения.
+However, it is necessary to ensure that the space path is sufficient to calculate the average value and there are no problems associated with ergodicity, such as:
+- the presence of barriers in which the energy is greater than at the initial moment of time: $U(x) > E$, which is why isolated areas are formed in the phase space.
+- lack of convergence when calculating the average value, which is why when calculating on a large number of points, the constant value is not reached.
 
-С этими проблемами необходимо разбираться индивидуально, на основе полученных данных.
+These problems need to be dealt with individually, based on the data obtained.
 
-### Как выглядит алгоритм?
-Процесс может быть описан следующими этапами:
+### What does the algorithm look like?
+The process can be described in the following steps:
 
-1. Определение системы, в том числе начального положения $x_0$
-2. Вычисление сил $F_i(x)$, действующих на частицы на $i$-м шаге
-3. Получение новых положений, на основе вычисленных сил, путем интегрирования уравнений движения $x_i \rightarrow x_{i+1}$
-4. Вычисление значений наблюдаемых величин $a(x)$ 
+1. Definition of the system, including the initial position $x_0$
+2. Calculation of forces $F_i(x)$ acting on particles at the $i$th step
+3. Obtaining new positions based on the calculated forces by integrating the equations of motion $x_i\rightarrow x_{i+1}$
+4. Calculation of the values of the observed quantities $a(x)$ 
 
-После пункта 4 происходит переход обратно к пункту 2 и т.д.
+After step 4, there is a transition back to step 2, etc.
 
-<!-- ![algo](images/algorithm.svg) -->
+In practice, all calculations required in paragraphs 2 and 3 should be performed quickly and accurately. Despite the fact that the main computational complexity lies in determining the forces, the integration of the equations of motion must also be carried out so that the final trajectory of motion coincides with the real one.
 
-На практике, все вычисления, необходимые в пунктах 2 и 3 должны производится быстро и точно. Несмотря на то, что основная вычислительная сложность заключается в определении сил, интегрирование уравнений движения также необходимо производить так, чтобы итоговая траектория движения совпадала с реальной.
+Next, we will discuss the features of the integrators required for the 3rd stage of modeling.
 
-Далее мы обсудим особенности интеграторов, необходимых для 3 этапа моделирования.
+## Integration of equations of motion
+Let's say the second stage has already been completed, and all the forces of $F$ have already been found by the time of $t$. Then we will consider several methods for determining the new positions and velocities of the particles $r$ and $v$ at subsequent points in time.
 
-## Интегрирование уравнений движений
-Допустим, второй этап уже выполнен, и все силы $F$ к моменту времени $t$ уже найдены. Тогда рассмотрим несколько методов для определения новых положений и скоростей частиц $r$ и $v$ в последующие моменты времени.
+However, when choosing a method, it is important to take into account that when numerically solving the equations of motion, it is necessary to have a quality criterion of the considered method, which will consist in preserving some property of these equations:
+- Reversibility in time $\Delta t\leftrightarrow - \Delta t$ 
+- Energy conservation $E = const$
+- Phase space conservation $\Delta q\Delta p = const$
 
-Однако при выборе метода необходимо учитывать, что при численном решении уравнений движения необходимо иметь критерий качества рассматриваемого метода, который будет заключаться в сохранении некоторого свойства этих уравнений, а именно:
-- Обратимость во времени $\Delta t \leftrightarrow - \Delta t$ 
-- Сохранение энергии $E = const$
-- Cохранение фазового пространства $\Delta q \Delta p = const$
-
-### Метод Эйлера
-Очевидным действием будет определить новое состояние системы при помощи разложения в ряд Тейлора:
+### Eulers method
+The obvious step would be to determine the new state of the system using Taylor series expansion:
 
 $$
 r (t + \Delta t) = r(t) + v(t) \Delta t + \frac{F(r)}{2m}
@@ -104,13 +105,13 @@ r (t + \Delta t) = r(t) + v(t) \Delta t + \frac{F(r)}{2m}
 v (t + \Delta t) = v(t) + \frac{F(r)}{m} \Delta t
 $$
 
-Предложенный выше метод не является обратимым во времени, поскольку явно нет симметрии по совершению шагу вперед и шагу назад.
+The method proposed above is not reversible in time, since there is clearly no symmetry in taking a step forward and a step back.
 
 
-### Метод Velocity-Verlet
-Попробуем описать метод, учитывающий тот факт, что при переходе к вычислению скоростей $v$ в момент времени $t+\Delta t$, положение $r(t+\Delta t)$, а значит и сила $F(r(t+\Delta t))$ уже известны. 
+### Velocity-Verlet method
+Let's try to describe a method that takes into account the fact that when switching to calculating the velocities of $v$ at time $t+\Delta t$, the position of $r(t+\Delta t)$, and hence the force of $F(r(t+\Delta t))$ are already known. 
 
-Обозначим $F(r(t)) = f(t)$, тогда:
+Denote $F(r(t)) = f(t)$, then:
 
 $$
 r (t + \Delta t) = r(t) + v(t) \Delta t + \frac{f(t)}{2m}
@@ -118,238 +119,243 @@ r (t + \Delta t) = r(t) + v(t) \Delta t + \frac{f(t)}{2m}
 v (t + \Delta t) = v(t) + \frac{f(t) + f(t+\Delta t)}{2 m} \Delta t
 $$
 
-Этот алгоритм уже лучше предыдущего, поскольку используется усреднее по времени. Напишем следующий шаг:
+This algorithm is already better than the previous one, since the time average is used. Let's write the next step:
 
 $$
 r(t + 2\Delta t) = r(t + \Delta t) + v(t + \Delta t) \Delta t + \frac{f(t + \Delta t)}{2m}
 \Delta t^2
 $$
 
-Используя выражения для $r(t + 2\Delta t)$ и $r(t + \Delta t)$, вычтем из первого второе:
+Using the expressions for $r(t+2\Delta t)$ and $r(t+\Delta t)$, we subtract the second from the first one:
 
 $$
 r(t + 2\Delta t) - r(t + \Delta t) = \\ 
 r(t + \Delta t) + v(t + \Delta t) \Delta t + \frac{f(t + \Delta t)}{2m} \Delta t^2 - r(t) - v(t) \Delta t - \frac{f(t)}{2m} \Delta t^2
 $$
 
-Тогда, подставля выражение для скорости $v (t + \Delta t)$, получим:
+Then, substituting the expression for the velocity $v(t+\Delta t)$, we get:
 
 $$
 r(t + 2\Delta t) + r(t) = 2 r(t + \Delta t) + \frac{f(t+\Delta t)}{m} \Delta t^2
 $$
 
-Видно, что полученный алгоритм является симметричным с точки зрения обращения времени.
+It can be seen that the resulting algorithm is symmetric in terms of time reversal.
 
-Для получения непосредственно алгоритма определения следующего положения системы, из известных предыдущих - произведем сдвиг на $\Delta t$:
+To obtain directly the algorithm for determining the next position of the system, from the known previous ones, we will make a shift by $\Delta t$:
 
 $$
 r(t + \Delta t) + r(t) = 2 r(t) - r(t - \Delta t)+ \frac{f(t)}{m} \Delta t^2
 $$
 
-Это алгоритм Верле. 
+That is Verlet algorithm. 
 
-## Метод Verlet 
+## Verlet method
 
-Давайте его получим независимо, из разложения в ряд Тейлора:
+Let's get it independently, from the Taylor series expansion:
 
 $$
 r(t + \Delta t) = r(t) + v(t) \Delta t + \frac{f(t)}{2m} \Delta t^2 + \frac{\ddot r(t) \Delta t^3}{3!} + O(\Delta t^4) \\
 r(t - \Delta t) = r(t) - v(t) \Delta t + \frac{f(t)}{2m} \Delta t^2 - \frac{\ddot r(t) \Delta t^3}{3!} + O(\Delta t^4) 
 $$
 
-Складывая, получаем:
+Summing up, we get:
 
 $$
 r(t + \Delta t) = 2r(t) - r(t - \Delta t) + \frac{f(t)}{m}\Delta t^2 + O(\Delta t^4)
 $$
 
-Этот алгоритм не учитывает знание о скоростях, а также при его использование получается выше точность в смысле $O(\Delta t^4)$ по сравнению с $O(\Delta t^2)$. 
+This algorithm does not take into account the knowledge of speeds, and also when using it, the accuracy $O(\Delta t^4)$ is higher compared to $O(\Delta t^2)$. 
 
-Однако из-за вычитания возникают проблемы с округлением, и помимо этого, часто скорости также важны для последующего анализа и их тогда уже нужно вычислять отдельно:
+However, due to subtraction, there are problems with rounding, and in addition, speeds are often also important for subsequent analysis and therefore they already need to be calculated separately.:
 
 $$
 v(t+\Delta t) = \frac{r(t + \Delta t) - r(t - \Delta t)}{2\Delta t} + O(\Delta t^2)
 $$
 
- Получаются алгоритмы, которые вычисляют одинаковые траектории, но сколько памяти они потребляют?
+ We get algorithms that calculate the same trajectories, but how much memory do they consume?
 
-- В Velocity-Verlet:  $3N \times 4$  
-Необходимо хранить скорости, координаты и силы в двух моментах времени.
+- In Velocity-Verlet: $3N \times 4$  
+It is necessary to store velocities, coordinates and forces at two moments in time.
 
-- В Verlet:  $3N \times 3$  
-Необходимо хранить силы, координаты в предыдущий и текущий момент времени, но без скоростей.
+- In Verlet: $3N \times 3$  
+It is necessary to store forces, coordinates at the previous and current time step, but without velocities.
 
-Однако есть еще один алгоритм, позволяющий получать силы и скорости практически одновременно и который генерирует такую же последовательность координат
+However, there is another algorithm that allows you to obtain forces and velocities almost simultaneously and which generates the same sequence of coordinates.
 
 ## Leapfrog Verlet
 
-Этот метод основывается на том, что можно вычислять скорости на половинном шаге:
+This method is based on the fact that it is possible to calculate the speeds at a half step:
 
 $$
 v(t + \frac{\Delta t}2) = \frac{r(t + \Delta t) - r(t)}{\Delta t} \\
 v(t - \frac{\Delta t}2) = \frac{r(t) - r(t - \Delta t)}{\Delta t}
 $$
 
-Тогда из известной скорости на половинном шаге вычисляется координата на следующем целом шаге:
+Then, from the known velocity at the half step, the coordinate at the next integer step is calculated:
 
 $$
 v(t + \frac{\Delta t}2) = v(t - \frac{\Delta t}2) + \frac{f(t)}{m} \Delta t^2 \\
 r(t + \Delta t) = r(t) + v(t + \frac{\Delta t}2) \Delta t
 $$
 
-Этот метод обеспечивает лучшую точность и удобство, поскольку отсутсвуют слогаемые с множителем $\Delta t^2$, а также симметричен относительно инверсии по времени.
+This method provides better accuracy and convenience, since there are no terms with a multiplier of $\Delta t^2$, and is also symmetric with respect to time inversion.
 
-Leapfrog-Verlet часто применяется на практике, однако у него есть недостаток, заключающийся в том, что при необходимости вычислить энергию $E = K + U$, представляющую собой сумму кинетических и потенциальных энергий, возникает проблема, поскольку скорости и координаты известны в различные моменты времени.
+Leapfrog-Verlet is often used in practice, but it has a drawback, which is that if it is necessary to calculate the energy $E = K + U$, which is the sum of kinetic and potential energies, a problem arises, since the velocities and coordinates are known at different points in time.
 
-## Преимущества представленных методов
-Одной из причин, по которой в молекулярной динамике не используются методы по типу Рунге-Кутты, является отсутствия свойства сохранения энергии $E$, которое критически важно например для определения траекторий спутников.
+## Advantages of the presented methods
+One of the reasons why Runge-Kutta-type methods are not used in molecular dynamics is the absence of the energy conservation property $E$, which is critically important, for example, for determining satellite trajectories.
 
-Алгоритмы выше хорошо сохраняют энергию, при этом ее важно сохранить как в короткосрочной, так и в долгосрочной перспективе.
+The algorithms above conserve energy well, while it is important to preserve it both in the short and long term.
 
-- Сохранение энергии в короткосрочной перспеткиве означает малое отличие траектории, полученной с помощью алгоритма, от идеальной (реальной). 
+- Energy conservation in the short term means a small difference between the trajectory obtained by the algorithm and the ideal (real) one. 
 
-- Сохранение энергии в долгосрочной перспективе означает малое изменение энергии по происшествии некоторого времени.
+- Energy conservation in the long term means a small change in energy after a while.
 
-Оказывется это два сильно разных условия.
+It turns out these are two very different conditions.
 
-Также отметим, что поскольку система Гамильтонова, то малое изменение энергии, означает что точки траетории, полученные с помощью алгоритма не далеко отходят от гиперплоскости, задаваемой функцией $\delta (H(p, q) - E)$. И это то, что не требуется для произвольного дифференциального уравнения.
+Also note that since the system is Hamiltonian, a small change in energy means that the points of the trajectory obtained using the algorithm do not depart far from the hypersurface given by the function $\delta(H(p, q) - E)$. And this is something that is not required for an arbitrary solution of the differential equation.
 
-## Про природу уравнений
+![hypersurface](images/fig2_hypersurface.svg)
 
-У рассматриваемых уравнений движения существует Ляпуновская расходимость.
 
-Рассмотрим точное решение уравнения:
+## About the nature of equations
+
+The considered equations of motion have a Lyapunov divergence.
+
+Let $r$ be the exact solution of the equation:
 
 $$
 r(t) = f(r(0), p(0), t)
 $$
 
-А также решение, полученное при небольшом сдвиге $\epsilon$ начального состояния:
+There is also solution, obtained with a small shift $\epsilon$ of the initial state:
 
 $$
 r'(t) = f(r(0), p(0) + \epsilon, t)
 $$
 
-Тогда их разность:
+Then their difference is:
 
 $$
 |\Delta r(t)| = |r'(t) - r(t)| \approx \epsilon \exp(\lambda t)
 $$
 
-Здесь $\lambda$ - Ляпуновские собственные числа, которые определяются данной системой и получаются большими, благодаря чему возникает сильная разница между итоговыми положениями при небольшом сдвиге начальных состояний.
+Here $\lambda$ are Lyapunov eigenvalues, which are determined by this system and are becomes large, due to which there is a big difference between the final positions with a small shift in the initial states.
 
-Например, на представленных ниже графиках зависимости среднего квадрата разности координат от времени для системы из четырех молекул воды видно, что при небольших раличиях $\varepsilon$ по сравнению с длиной связи 1 Ангстрем в начальных положениях, через некоторое количество шагов, измеряемые величины становятся полностью независимыми.
+![Divergence of trajectories of water molecules](images/fig3_divergence.png)
 
-Для вычисления среднего значения какой-либо величины это не важно, поскольку главное - находится на заданной гиперповерхности, однако быстрое расхождение из-за небольших начальных смещений важно, когда необходимо вычислять корреляционные функции.
+For example, on the graphs below of the dependence of the mean square of the coordinate difference on time for a system of four water molecules, it can be seen that with small differences of $\varepsilon$ compared to the bond length of 1 Angstrom in the initial positions, after a certain number of steps, the measured quantities become completely independent.
 
-Стандартно, если величины были скоррелированны, то наблюдается некоторый спад. При моделировании необходимо, чтобы за характерное время корреляции координата не расходилась.
+To calculate the average value of any quantity, this is not important, since the main thing is to stay on a given hypersurface, however, rapid divergence due to small initial offsets becomes  important when it is necessary to calculate correlation functions.
 
-Помимо этого, даже если траектория не сильно отличается от истинной, то возникает вопрос о долгосрочной стабильности - не происходит ли сильного удаления $\lvert E(x(t + \Delta t)) - E_0 \rvert$ от заданной плоскости.
+As a standard, if the values were correlated, then there is some decline. When modeling, it is necessary that the coordinate does not diverge during the characteristic correlation time.
 
-Есть наблюдения, которые не являются строго доказанными, что при использовании алгоритмов, обладающих следующими свойствами:
+In addition, even if the trajectory does not differ much from the true one, the question arises about long-term stability - is there a large distance $\lvert E(x(t +\Delta t)) - E_0\rvert$ from a given plane.
 
-- Обратимость во времени $\Delta t \leftrightarrow - \Delta t$ 
-- Симплектичность или сохранение энергии $E = const$
-- Cохранение фазового пространства $\Delta q \Delta p = const$
+There are observations that are not strictly proven that when using algorithms with the following properties:
 
-Оказывается, что:
+- Reversibility in time $\Delta t\leftrightarrow - \Delta t$ 
+- Symplecticity or energy conservation $E = const$
+- Phase space conservation $\Delta q\Delta p = const$
 
-1. Траектории, полученные с помощью таких алгоритмов являются  теневыми траекториями, которые не сильно отстают от реальных
-2. Эти методы точно, если нет ошибок округления, сохраняют Гамильтониан $\tilde H = H + O(\Delta t^2)$ (доказано)
+It turns out that:
+
+1. The trajectories obtained using such algorithms are shadow trajectories that do not lag far behind the real ones
+2. These methods exactly preserve the Hamiltonian $\tilde H = H+O(\Delta t^2)$, if there are no rounding errors. (proved)
 
 
-### Откуда это видно?
+### Where does this come from?
 
-Пусть задан Гамильтониан $H(q, p)$, тогда:
+Let the Hamiltonian $H(q, p)$ be given, then:
 
 $$
 \dot q = \frac{\partial H}{\partial p}; \quad \dot p = - \frac{\partial H}{\partial q}
 $$
 
-Эволюция функции от координат может быть записанна через оператор Лиувилля $L$:
+The evolution of a function of coordinates can be written using the Liouville operator $L$:
 
 $$
 \frac{da(q, p)}{dt} = \sum_{\alpha} \frac{\partial a}{\partial q} \dot q + \frac{\partial a}{\partial p} \dot p = 
 \sum \frac{\partial H}{\partial p} \frac{\partial a}{\partial q} - \frac{\partial H}{\partial q} \frac{\partial a}{\partial p} = \{a, H\} = i L a
 $$
 
-Получается дифференциальное уравнение с известными начальными уусловиями, решение которой может быть найдено:
+It turns out a differential equation with known initial conditions, the solution of which can be found:
 
 $$
 \frac{da}{dt} = i L a \quad t = 0: x_0 \\
 a(x(t)) = e^{iLt}a(x(t))
 $$
 
-Исходя из размышлений выше, можно составить схему для численного решения: 
+Based on the reflections above, it is possible to draw up a scheme for a numerical solution:
 
 $$
 x = \begin{pmatrix}q \\ p\end{pmatrix} \Rightarrow x(t) = e^{iLt}x(0)
 $$
 
-Для полнимания пользы данной формулировки, разделим оператор Лиувилля на две части, соответсвующие каждому из слогаемых в скобках Пуассона:
+To understand the usefulness of this formulation, we divide the Liouville operator into two parts corresponding to each of the terms in Poisson brackets:
 
 $$
 iL = iL_1 + iL_2 = \frac{\partial H}{\partial p} \frac{\partial }{\partial q} - \frac{\partial H}{\partial q} \frac{\partial }{\partial p}
 $$
 
-Для примера рассмотрим частную одномерную задачу:
+For example, consider a particular one-dimensional problem:
 
 $$
 H = \frac{p^2}{2m} + U(r) \Rightarrow
 iL_1 = \frac{p}{m} \frac{\partial}{\partial r}; \quad iL_2 = F(r) \frac{\partial}{\partial p}
 $$
 
-Заметим что эти два оператора не коммутируют:
+Note that these two operators do not commutate:
 
 $$
 [iL_1, iL_2] \ne 0
 $$
 
-Откуда следует, что 
+From which it follows that
 
 $$
 e^{iL_1 + iL_2} \ne e^{iL_1} + e^{iL_2} 
 $$
 
-Тогда необходимо воспользоваться теоремой Троттера:
+Then it is necessary to use Trotter's theorem:
 
 $$
 e^{A+B} = \lim_{p \rightarrow \infty} \left[ e^{\frac{B}{2p}}e^{\frac{A}{p}}e^{\frac{B}{2p}}\right]^p
 $$
 
-В нашем случае, вместо $p$ будет $\frac{t}{\Delta t}= M$ - количество шагов
+In our case, instead of $p$, there will be $\frac{t}{\Delta t}= M$ - the number of steps
 
 $$
 e^{iLt} = e^{iL_1t +iL_2t} = \lim_{p \rightarrow \infty} \left[ e^{\frac{iL_2t}{2p}}e^{\frac{iL_1t}{p}}e^{\frac{iL_2t}{2p}}\right]^p = 
 \lim_{\Delta t \rightarrow 0} \left[ e^{\frac{iL_2 \Delta t}{2}}e^{iL_1 \Delta t}e^{\frac{iL_2 \Delta t}{2}}\right]^{\frac{t}{\Delta t}}
 $$
 
-Для данного предела имеется следующая оценка:
+For this limit , there is the following estimate:
 
 $$
 e^{iLt} = \left[ e^{\frac{iL_2 \Delta t}{2}}e^{iL_1 \Delta t}e^{\frac{iL_2 \Delta t}{2}}\right]^{M} + O(M\Delta t^3)
 $$
 
-То есть эволюция системы от состояния в момент времени $t$ до состояния в момент времени $t + \Delta t$ задается оператором: 
+That is, the evolution of the system from the state at time $t$ to the state at time $t + \Delta t$ is given by the operator:
 
 $$
 e^{\frac{iL_2 \Delta t}{2}}e^{iL_1 \Delta t}e^{\frac{iL_2 \Delta t}{2}} + O(\Delta t^3)
 $$
 
-Рассмотрим, например, как действует оператор $e^{iL_2\frac{\Delta t}{2}}$:
+Consider, for example, action of the operator $e^{iL_2\frac{\Delta t}{2}}$:
 
 $$
 e^{c \frac{\partial}{\partial x}}g(x) = \sum \frac{1}{n!} c^n \frac{2^n g(x)}{\partial x^n} = g(x+c)
 $$
 
-Получается, что фактически этот оператор действует как сдвиг, то есть:
+It turns out that in fact this operator acts as a shift, that is:
 
 $$
 e^{iL_2\frac{\Delta t}{2}} \begin{pmatrix} x \\ p\end{pmatrix} \rightarrow \begin{pmatrix} x \\ \dot p  + \frac{F(r) \Delta t}{2} \end{pmatrix}
 $$
 
-Аналогично оператор $L_1$ будет сдвигать положение по координате.
+Similarly, the $L_1$ operator will shift the position by coordinate.
 
-То есть действие приближенного оператора $\tilde L$, аналогичного $\tilde H$, с определенной точностью, будет заключаться в последовательном применении сдвига по импульсу, сдвига по координате и еще раз сдвига по импульсу.
+That is, the action of the approximate operator $\tilde L$, similar to $\tilde H$, with a certain accuracy, will consist in the sequential application of the momentum shift, the coordinate shift, and again the momentum shift.
 
-Вспоминая алгоритм Velocity-Verlet, можно увидеть подобное поведение, о чем будет подробнее рассказано в следующей лекции.
+Remembering the Velocity-Verlet algorithm, you can see similar behavior, which will be described in more detail in the next lecture.
