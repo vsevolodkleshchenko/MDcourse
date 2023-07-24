@@ -1,14 +1,14 @@
 # MDcourse
 
-Для корректного отображения формул откройте сайт на [GitHub pages](https://vsevolodkleshchenko.github.io/MDcourse/).
+To display the formulas correctly, open the website on [GitHub pages](https://vsevolodkleshchenko.github.io/MDcourse/).
 
-## Лекции
-1. [Уравнения движения.](lectures/lecture1/lecture1.md)
+## Lectures
+1. [Equations of motion.](lectures/lecture1/lecture1.md)
 
-## Практика
-1. [Моделирование в HOOMD-blue. Распределение скоростей.](https://nbviewer.org/github/vsevolodkleshchenko/MDcourse/blob/main/practice/MD_tutorial_and_velocity_distributions.ipynb)
+## Practice
+1. [Simulations in HOOMD-blue. Velocity distribution.](https://nbviewer.org/github/vsevolodkleshchenko/MDcourse/blob/main/practice/MD_tutorial_and_velocity_distributions.ipynb)
 
-## Список литературы
+## Literature
 1. D. Frenkel, B. Smit, Understanding Molecular Simulation, 2nd Edition, Academic Press, New York, 2001.
 2. Tuckerman, Mark. Statistical mechanics: theory and molecular simulation. Oxford university press, 2010.
 3. Leimkuhler, Benedict, and Sebastian Reich. Simulating hamiltonian dynamics. No. 14. Cambridge university press, 2004.
