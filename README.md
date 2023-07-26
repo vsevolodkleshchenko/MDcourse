@@ -4,6 +4,7 @@ To display the formulas correctly, open the website on [GitHub pages](https://vs
 
 ## Lectures
 1. [Equations of motion.](lectures/lecture1/lecture1.md)
+2. [Potential energy, forces, boundary conditions.](lectures/lecture2/lecture2.md)
 
 ## Practice
 1. [Simulations in HOOMD-blue. Velocity distribution.](https://nbviewer.org/github/vsevolodkleshchenko/MDcourse/blob/main/practice/MD_tutorial_and_velocity_distributions.ipynb)
