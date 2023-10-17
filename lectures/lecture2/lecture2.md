@@ -1,3 +1,5 @@
+# Lecture 2
+
 ## About the nature of equations
 
 The considered equations of motion have a Lyapunov divergence.
@@ -91,7 +93,7 @@ $$
 [iL_1, iL_2] \ne 0
 $$
 
-From which it follows that
+From which it follows that (See Baker–Campbell–Hausdorff formula)
 
 $$
 e^{iL_1 + iL_2} \ne e^{iL_1} + e^{iL_2} 
@@ -139,66 +141,103 @@ Similarly, the $L_1$ operator will shift the position by coordinate.
 
 <!-- That is, the action of the approximate operator $\tilde L$, similar to $\tilde H$, with a certain accuracy, will consist in the sequential application of the momentum shift, the coordinate shift, and again the momentum shift. -->
 
-### Revisiting Velocity-Verlet method
+## Integrators
 
-Найдем формулы для расчета состояния системы после перехода из точки $t=0$, $\begin{pmatrix}r(0) \\ p(0)\end{pmatrix}$ в точку $t=\Delta t$, $\begin{pmatrix}r(\Delta t) \\ p(\Delta t)\end{pmatrix}$ при помощи оператора Лиувиля
-$$ \begin{pmatrix}r(\Delta t) \\ p(\Delta t)\end{pmatrix} = \text{e}^{i\hat{L}\Delta t} \begin{pmatrix}r(0) \\ p(0)\end{pmatrix} $$
-Для этого поочередно подействуем экспонентами:
-1. $$\text{e}^{iL_2\frac{\Delta t}{2}} \begin{pmatrix}r(0) \\ p(0)\end{pmatrix} = \text{e}^{F(r(0))\frac{\Delta t}{2} \frac{\partial}{\partial p}} \begin{pmatrix}r(0) \\ p(0)\end{pmatrix} \\ =  \begin{pmatrix}r(0) \\ p(0) + F(r(0))\frac{\Delta t}{2}\end{pmatrix}$$
-2. $$\text{e}^{iL_1\Delta t} \begin{pmatrix}r(0) \\ p(0) + F(r(0))\frac{\Delta t}{2}\end{pmatrix} = \text{e}^{\frac{p(0)}{m}\Delta t \frac{\partial}{\partial r}} \begin{pmatrix}r(0) \\ p(0) + F(r(0))\frac{\Delta t}{2}\end{pmatrix} \\ = \begin{pmatrix}r(0) + \frac{p(0)}{m}\Delta t\\ p(0) + F\left(r(0) + \frac{p(0)}{m}\Delta t\right)\frac{\Delta t}{2}\end{pmatrix}$$
-3. $$\text{e}^{iL_2\frac{\Delta t}{2}}\begin{pmatrix}r(0) + \frac{p(0)}{m}\Delta t\\ p(0) + F\left(r(0) + \frac{p(0)}{m}\Delta t\right)\frac{\Delta t}{2}\end{pmatrix} =  \text{e}^{F(r(0))\frac{\Delta t}{2} \frac{\partial}{\partial p}} \begin{pmatrix}r(0) + \frac{p(0)}{m}\Delta t\\ p(0) + F\left(r(0) + \frac{p(0)}{m}\Delta t\right)\frac{\Delta t}{2}\end{pmatrix} \\ = \begin{pmatrix}r(0) + \frac{1}{m}\left(p(0) + F(r(0))\frac{\Delta t}{2}\right)\Delta t\\ p(0) + F(r(0))\frac{\Delta t }{2} + F\left(r(0) + \frac{1}{m}\left(p(0) + F(r(0))\frac{\Delta t}{2}\right)\Delta t\right)\frac{\Delta t}{2}\end{pmatrix} = \begin{pmatrix}r(\Delta t) \\ p(\Delta t)\end{pmatrix}$$
+### Revisiting velocity-Verlet method
 
-Используя скорость $v=\frac{p}{m}$, последнее равенство можно переписать в виде
-$$\begin{cases}r(\Delta t) = r(0) + v(0)\Delta t + \frac{F(r(0))}{m}\frac{\Delta t ^2}{2} \\ v(\Delta t) = v(0) + \frac{\Delta t}{2}\left(\frac{F(r(0))}{m} + \frac{F(r(\Delta t))}{m}\right)\end{cases}$$
-Используем индекс номера шага вместо аргументов
-$$\begin{cases}r_{i+1} = r_i + v_i\Delta t + \frac{F(r_i)}{m}\frac{\Delta t ^2}{2} \\ v_{i+1} = v_i + \frac{\Delta t}{2}\left(\frac{F(r_i)}{m} + \frac{F(r_{i+1})}{m}\right)\end{cases}$$
-Эти формулы задают один шаг алгоритма и совпадают с полученными для алгоритма Verlet method (see previous lecture).
+The state of the system at $t=\Delta t$ can be obtained from the state at $t=0$ with a help of Liouville operator
+
+$$\begin{pmatrix}r(\Delta t) \\ p(\Delta t)\end{pmatrix} = \text{e}^{iL\Delta t} \begin{pmatrix}r_0 \\ p_0\end{pmatrix}  = \underbrace{\text{e}^{iL_2\frac{\Delta t}{2}}\underbrace{\text{e}^{iL_1\Delta t}\underbrace{\text{e}^{iL_2\frac{\Delta t}{2}} \begin{pmatrix}r_0 \\ p_0\end{pmatrix}}_{1}}_{2}}_{3} $$
+
+Here and after $p_t = p(t)$, $r_t=r(t)$.
+Acting with operators step-by-step:
+1. $$\text{e}^{iL_2\frac{\Delta t}{2}} \begin{pmatrix}r_0 \\ p_0\end{pmatrix} = \text{e}^{F(r_0)\frac{\Delta t}{2} \frac{\partial}{\partial p}} \begin{pmatrix}r_0 \\ p_0\end{pmatrix} \\ =  \begin{pmatrix}r_0 \\ p_0 + F(r_0)\frac{\Delta t}{2}\end{pmatrix}$$
+2. $$\text{e}^{iL_1\Delta t} \begin{pmatrix}r_0 \\ p_0 + F(r_0)\frac{\Delta t}{2}\end{pmatrix} = \text{e}^{\frac{p_0}{m}\Delta t \frac{\partial}{\partial r}} \begin{pmatrix}r_0 \\ p_0 + F(r_0)\frac{\Delta t}{2}\end{pmatrix} \\ = \begin{pmatrix}r_0 + \frac{p_0}{m}\Delta t\\ p_0 + F\left(r_0 + \frac{p_0}{m}\Delta t\right)\frac{\Delta t}{2}\end{pmatrix}$$
+3. $$\text{e}^{iL_2\frac{\Delta t}{2}}\begin{pmatrix}r_0 + \frac{p_0}{m}\Delta t\\ p_0 + F\left(r_0 + \frac{p_0}{m}\Delta t\right)\frac{\Delta t}{2}\end{pmatrix} =  \text{e}^{F(r_0)\frac{\Delta t}{2} \frac{\partial}{\partial p}} \begin{pmatrix}r_0 + \frac{p_0}{m}\Delta t\\ p_0 + F\left(r_0 + \frac{p_0}{m}\Delta t\right)\frac{\Delta t}{2}\end{pmatrix} \\ = \begin{pmatrix}r_0 + \frac{1}{m}\left(p_0 + F(r_0)\frac{\Delta t}{2}\right)\Delta t\\ p_0 + F(r_0)\frac{\Delta t }{2} + F\left(r_0 + \frac{1}{m}\left(p_0 + F(r_0)\frac{\Delta t}{2}\right)\Delta t\right)\frac{\Delta t}{2}\end{pmatrix} = \begin{pmatrix}r_{\Delta t} \\ p_{\Delta t}\end{pmatrix}$$
+
+By assigning $v(t)=\dfrac{p(t)}{m}$, the result can be rewritten
+
+$$\begin{dcases}r_{\Delta t} = r_0 + v_0\Delta t + \frac{F(r_0)}{m}\frac{\Delta t ^2}{2} \\ v_{\Delta t} = v_0 + \frac{\Delta t}{2}\left(\frac{F(r_0)}{m} + \frac{F(r_{\Delta t})}{m}\right)\end{dcases}$$
+
+Timestamps can be changed to indexes (considering time steps are equal)
+
+$$\begin{dcases}r_{i+1} = r_i + v_i\Delta t + \frac{F(r_i)}{m}\frac{\Delta t ^2}{2} \\ v_{i+1} = v_i + \frac{\Delta t}{2}\left(\frac{F(r_i)}{m} + \frac{F(r_{i+1})}{m}\right)\end{dcases}$$
+
+One can see this iteration formulas coincide with Velocity-Verlet method formulas (see previous lecture) and represents one step of integration algorithm.
 
 ### Revisiting Leapfrog Verlet
 
-Из этого алгорима можно получить эквивалентный алгоритм Leapfrog Verlet.
-Для этого рассмотрим два шага алгоритма из точки $t=-\Delta t$ в точку $t=0$ и далее в точку $t=\Delta t$:
+It is possible to obtain leapfrog integration from the previous method.
+Suppose two time steps:
+1. $t=-\Delta t$ to $t=0$ 
+2. $t=0$ to $t=\Delta t$.
 
-![Два шага](images/fig1.png)
+![Two steps](images/fig1.png)
 
-Эту схему можно "сдвинуть", рассмотрев условные точки $t=-\frac{\Delta t}{2}$ и $t=\frac{\Delta t}{2}$:
+It is possible to "shift" the scheme by introducing auxiliary time steps $t=-\frac{\Delta t}{2}$ and $t=\frac{\Delta t}{2}$:
 
-![Дополнительные точки](images/fig2.png)
+![Auxiliary steps](images/fig2.png)
 
-Получаем
-$$\begin{pmatrix}r(\frac{1}{2}\Delta t) \\ p(\frac{1}{2}\Delta t)\end{pmatrix} = \text{e}^{iL_2\frac{\Delta t}{2}}\text{e}^{iL_2\frac{\Delta t}{2}}\text{e}^{iL_1\Delta t}\begin{pmatrix}r(-\frac{1}{2}\Delta t) \\ p(-\frac{1}{2}\Delta t)\end{pmatrix} = \text{e}^{iL_2\Delta t}\text{e}^{iL_1\Delta t}\begin{pmatrix}r(-\frac{1}{2}\Delta t) \\ p(-\frac{1}{2}\Delta t)\end{pmatrix}$$
-где мы воспользовались произведением экспонент двух коммутирующих (в данном случае равных) операторов. 
-Аналогично проделанному выше
-$$\text{e}^{iL_2\Delta t}\text{e}^{iL_1\Delta t}\begin{pmatrix}r(-\frac{1}{2}\Delta t) \\ p(-\frac{1}{2}\Delta t)\end{pmatrix} = \text{e}^{iL_2\Delta t} \begin{pmatrix}r(-\frac{1}{2}\Delta t) + \frac{ p(-\frac{1}{2}\Delta t)}{m}\Delta t \\ p(-\frac{1}{2}\Delta t)\end{pmatrix} \\ = \begin{pmatrix}r(-\frac{1}{2}\Delta t) + \frac{ p(-\frac{1}{2}\Delta t) + F(r(-\frac{1}{2}\Delta t))\Delta t}{m}\Delta t \\ p(-\frac{1}{2}\Delta t) + F(r(-\frac{1}{2}\Delta t))\Delta t\end{pmatrix} = \begin{pmatrix}r(\frac{1}{2}\Delta t) \\ p(\frac{1}{2}\Delta t)\end{pmatrix}$$
-Из последнего равенства получаем 
-$$\begin{cases}p(\frac{1}{2}\Delta t) = p(-\frac{1}{2}\Delta t) + F(r(-\frac{1}{2}\Delta t))\Delta t \\ r(\frac{1}{2}\Delta t) = r(-\frac{1}{2}\Delta t) + \frac{p(\frac{1}{2}\Delta t)}{m}\Delta t \end{cases}$$
-Чтобы понять, что такое $p(\pm\frac{1}{2}\Delta t)$ и $r(\pm\frac{1}{2}\Delta t)$, рассмотрим переход
-$$\begin{pmatrix}r(\frac{1}{2}\Delta t) \\ p(\frac{1}{2}\Delta t)\end{pmatrix} = \text{e}^{iL_2\frac{\Delta t}{2}} \begin{pmatrix}r(0) \\ p(0)\end{pmatrix} = \begin{pmatrix}r(0) \\ p(0) + F(r(0))\frac{\Delta t}{2}\end{pmatrix} $$
-Таким образом, $r(\frac{1}{2}\Delta t) = r(0)$, $p(\frac{1}{2}\Delta t) = p(0) + F(r(0))\frac{\Delta t}{2}$, аналогично $r(-\frac{1}{2}\Delta t) = r(-\Delta t)$, $p(-\frac{1}{2}\Delta t) = p(-\Delta t) + F(r(-\Delta t))\frac{\Delta t}{2}$.
-Теперь шаг алгоритма можно явно записать
-$$\begin{cases}p(\frac{1}{2}\Delta t) = p(-\frac{1}{2}\Delta t) + F(r(-\Delta t))\Delta t \\ r(0) = r(-\Delta t) + \frac{p(\frac{1}{2}\Delta t)}{m}\Delta t \end{cases}$$
-где начальное значение $p(-\frac{1}{2}\Delta t)$ определяется по формуле $p(-\frac{1}{2}\Delta t) = p(-\Delta t) + F(r(-\Delta t))\frac{\Delta t}{2}$.
+Relation between system state at $t=\dfrac{\Delta t}{2}$ and  $t=\dfrac{-\Delta t}{2}$ is
 
-Запишем алгоритм, используя индексы с номером шага вместо аргументов
-$$\begin{cases}p_{i+1/2} = p_{i-1/2} + F(r_{i-1})\Delta t \\ r_i = r_{i-1} + \frac{p_{i+1/2}}{m}\Delta t \end{cases}$$
+$$\begin{pmatrix}r_{\Delta t/2} \\ p_{\Delta t/2}\end{pmatrix} = \text{e}^{iL_2\frac{\Delta t}{2}}\text{e}^{iL_2\frac{\Delta t}{2}}\text{e}^{iL_1\Delta t}\begin{pmatrix}r_{-\Delta t/2} \\ p_{-\Delta t/2}\end{pmatrix} = \text{e}^{iL_2\Delta t}\text{e}^{iL_1\Delta t}\begin{pmatrix}r_{-\Delta t/2} \\ p_{-\Delta t/2}\end{pmatrix}$$
+
+where $\text{e}^A\text{e}^A = \text{e}^{2A}$ is used (due to the fact $A$ and $A$ commute). 
+Similarly to the above, the action of the operators can be described step by step
+
+$$\text{e}^{iL_2\Delta t}\text{e}^{iL_1\Delta t}\begin{pmatrix}r_{-\Delta t/2} \\ p_{-\Delta t/2}\end{pmatrix} = \text{e}^{iL_2\Delta t} \begin{pmatrix}r_{-\Delta t/2} + \frac{ p_{-\Delta t/2}}{m}\Delta t \\ p_{-\Delta t/2}\end{pmatrix} \\ = \begin{pmatrix}r_{-\Delta t/2} + \frac{ p_{-\Delta t/2} + F\left(r_{-\Delta t/2}\right)\Delta t}{m}\Delta t \\ p_{-\Delta t/2} + F\left(r_{-\Delta t/2}\right)\Delta t\end{pmatrix} = \begin{pmatrix}r_{\Delta t/2} \\ p_{\Delta t/2}\end{pmatrix}$$
+
+From the last equality it follows that
+
+$$\begin{dcases}p_{\Delta t/2} = p_{-\Delta t/2} + F\left(r_{-\Delta t/2}\right)\Delta t \\ r_{\Delta t/2} = r_{-\Delta t/2} + \frac{p_{\Delta t/2}}{m}\Delta t \end{dcases}$$
+
+What $p_{\pm\Delta t/2}$ and $r_{\pm\Delta t/2}$ actually mean?
+
+$$\begin{pmatrix}r_{\Delta t/2} \\ p_{\Delta t/2}\end{pmatrix} = \text{e}^{iL_2\frac{\Delta t}{2}} \begin{pmatrix}r_0 \\ p_0\end{pmatrix} = \begin{pmatrix}r_0 \\ p_0 + F(r_0)\frac{\Delta t}{2}\end{pmatrix} $$
+
+Therefore, $r_{\Delta t/2} = r_0$, $p_{\Delta t/2} = p_0 + F(r_0)\frac{\Delta t}{2}$.
+In the same way it can be shown that $r_{-\Delta t/2} = r_{-\Delta t}$, $p_{-\Delta t/2} = p_{-\Delta t} + F\left(r_{-\Delta t}\right)\frac{\Delta t}{2}$.
+
+Now it is possible to write the method explicitly
+
+$$\begin{dcases}p_{\Delta t/2} = p_{-\Delta t/2} + F\left(r_{-\Delta t}\right)\Delta t \\ r_0 = r_{-\Delta t} + \frac{p_{\Delta t/2}}{m}\Delta t \end{dcases}$$
+
+Initial value of auxiliary momentum can be computed as $p_{-\Delta t/2} = p_{-\Delta t} + F(r_{-\Delta t})\frac{\Delta t}{2}$.
+
+Rewriting with indexes instead of timestamps
+
+$$\begin{dcases}p_{i+1/2} = p_{i-1/2} + F(r_{i-1})\Delta t \\ r_i = r_{i-1} + \frac{p_{i+1/2}}{m}\Delta t \end{dcases}$$
+
 $$p_{i-1/2} =p_{i-1} + F(r_{i-1})\frac{\Delta t}{2}$$
-Для наглядности, сдвинем индексы у $r$, а у вспомогательной переменной $p_{i\pm1/2}$ оставим их на месте. 
-$$\begin{cases}p_{i+1/2} = p_{i-1/2} + F(r_i)\Delta t \\ r_{i+1} = r_{i} + \frac{p_{i+1/2}}{m}\Delta t \end{cases}$$
+
+For clarity we shift the indices of the "real" $r$ variable, while keeping the indices of the auxiliary variable $p_{i\pm1/2}$.
+
+$$\begin{dcases}p_{i+1/2} = p_{i-1/2} + F(r_i)\Delta t \\ r_{i+1} = r_{i} + \frac{p_{i+1/2}}{m}\Delta t \end{dcases}$$
 $$p_{i-1/2} =p_{i} + F(r_{i})\frac{\Delta t}{2}$$
-Эти формулы и задают шаг алгоритма leapfrog.
-Начальное значение для шага алгоритма $i=0$: $p_{-1/2} = p_0 + F(0)\frac{\Delta t}{2}$.
 
-При использовании приближения 
+These formulas express leapfrog integration method.
+The initial value for $i=0$: $p_{-1/2} = p_0 + F_0\frac{\Delta t}{2}$.
+
+### Integration errors 
+
+The methods Described above are symplectic integrators.
+One of the properties of such integrators is preservation on the total energy of the system. In other words, the system neither warms up nor freezes with time.
+
+When using the approximation
+
 $$\text{e}^{iLt}\approx \left(\text{e}^{iL_2\frac{\Delta t}{2}}\text{e}^{iL_1\Delta t}\text{e}^{iL_2\frac{\Delta t}{2}}\right)^M = \text{e}^{i\widetilde{L}t}$$
-получается, что система численно эволюционирует не при помощи исходного оператора $L$, а при помощи некого $\widetilde{L}$, который соответствует некоторому гамильтониану $\widetilde{H}$, отличному от исходного.
-Отличие эффективного гамильтониана от исходного определяет порядок симплектического метода интегрирования.
-Например, полунеявный метод Эйлера является методом первого порядка, его можно получить, рассматривая приближение 
+
+it turns out that the system numerically evolves not with the original operator $L$, but with some $\widetilde{L}$, which corresponds to some Hamiltonian $\widetilde{H}$ not equal to the original $H$.
+The difference between $\widetilde{H}$ and $H$ determines the order of the symplectic integrator.
+For example, the semi-implicit Euler method is the first-order integrator. Semi-implicit Euler method can be obtained by considering the approximation
+
 $$\text{e}^{i\widetilde{L}\Delta t} = \text{e}^{iL_1\Delta t}\text{e}^{iL_2\Delta t}$$
-Если проверить, какому гамильтониану соответствует $\widetilde{L}$ в данном случае, то окажется, что $\widetilde{H}=H + O(\Delta t)$.
-В случае рассмотренного алгоритма velocity Verlet $\widetilde{H}=H + O(\Delta t^2)$.
 
-Симплектические алгоритмы можно соединять друг с другом, пытаясь приблизить оператор $\widetilde{L}$ к исходному $L$.
-Например, [в этой работе](10.1016/0375-9601(90)90092-3) представлен способ конструирования симплектических интеграторов 4, 6 и 8 порядков.
-Метод 4ого порядка эквивалентен произведению 7ми операторных экспонент!
-С увеличением порядка метода увеличиваются формулы для одного шага. 
+and using the same approach as for velocity-Verlet method above.
+It can be proven that in this case effective Hamiltonian differs from $H$ by some term proportional to $\Delta t$: $\widetilde{H}=H + O(\Delta t)$.
+For velocity-Verlet method, which is second-order method, $\widetilde{H}=H + O(\Delta t^2)$.
 
+Symplectic methods can be combined with each other to obtain high-order integrator and to get $\widetilde{L}$ closer to $L$
+Foe example, [in this work](https://doi.org/10.1016/0375-9601(90)90092-3) the method of designing symplectic integrators of 4, 6 and 8 orders is presented.
+The 4th order integrator requires multiplication of 7 matrix exponentials.
+As the order of the integrator increases, the formulas for one step grow.
