@@ -157,11 +157,11 @@ Acting with operators step-by-step:
 
 By assigning $v(t)=\dfrac{p(t)}{m}$, the result can be rewritten
 
-$$\begin{dcases}r_{\Delta t} = r_0 + v_0\Delta t + \frac{F(r_0)}{m}\frac{\Delta t ^2}{2} \\ v_{\Delta t} = v_0 + \frac{\Delta t}{2}\left(\frac{F(r_0)}{m} + \frac{F(r_{\Delta t})}{m}\right)\end{dcases}$$
+$$\begin{cases}r_{\Delta t} = r_0 + v_0\Delta t + \frac{F(r_0)}{m}\frac{\Delta t ^2}{2} \\ v_{\Delta t} = v_0 + \frac{\Delta t}{2}\left(\frac{F(r_0)}{m} + \frac{F(r_{\Delta t})}{m}\right)\end{cases}$$
 
 Timestamps can be changed to indexes (considering time steps are equal)
 
-$$\begin{dcases}r_{i+1} = r_i + v_i\Delta t + \frac{F(r_i)}{m}\frac{\Delta t ^2}{2} \\ v_{i+1} = v_i + \frac{\Delta t}{2}\left(\frac{F(r_i)}{m} + \frac{F(r_{i+1})}{m}\right)\end{dcases}$$
+$$\begin{cases}r_{i+1} = r_i + v_i\Delta t + \frac{F(r_i)}{m}\frac{\Delta t ^2}{2} \\ v_{i+1} = v_i + \frac{\Delta t}{2}\left(\frac{F(r_i)}{m} + \frac{F(r_{i+1})}{m}\right)\end{cases}$$
 
 One can see this iteration formulas coincide with Velocity-Verlet method formulas (see previous lecture) and represents one step of integration algorithm.
 
@@ -189,7 +189,7 @@ $$\text{e}^{iL_2\Delta t}\text{e}^{iL_1\Delta t}\begin{pmatrix}r_{-\Delta t/2} \
 
 From the last equality it follows that
 
-$$\begin{dcases}p_{\Delta t/2} = p_{-\Delta t/2} + F\left(r_{-\Delta t/2}\right)\Delta t \\ r_{\Delta t/2} = r_{-\Delta t/2} + \frac{p_{\Delta t/2}}{m}\Delta t \end{dcases}$$
+$$\begin{cases}p_{\Delta t/2} = p_{-\Delta t/2} + F\left(r_{-\Delta t/2}\right)\Delta t \\ r_{\Delta t/2} = r_{-\Delta t/2} + \frac{p_{\Delta t/2}}{m}\Delta t \end{cases}$$
 
 What $p_{\pm\Delta t/2}$ and $r_{\pm\Delta t/2}$ actually mean?
 
@@ -200,19 +200,19 @@ In the same way it can be shown that $r_{-\Delta t/2} = r_{-\Delta t}$, $p_{-\De
 
 Now it is possible to write the method explicitly
 
-$$\begin{dcases}p_{\Delta t/2} = p_{-\Delta t/2} + F\left(r_{-\Delta t}\right)\Delta t \\ r_0 = r_{-\Delta t} + \frac{p_{\Delta t/2}}{m}\Delta t \end{dcases}$$
+$$\begin{cases}p_{\Delta t/2} = p_{-\Delta t/2} + F\left(r_{-\Delta t}\right)\Delta t \\ r_0 = r_{-\Delta t} + \frac{p_{\Delta t/2}}{m}\Delta t \end{cases}$$
 
 Initial value of auxiliary momentum can be computed as $p_{-\Delta t/2} = p_{-\Delta t} + F(r_{-\Delta t})\frac{\Delta t}{2}$.
 
 Rewriting with indexes instead of timestamps
 
-$$\begin{dcases}p_{i+1/2} = p_{i-1/2} + F(r_{i-1})\Delta t \\ r_i = r_{i-1} + \frac{p_{i+1/2}}{m}\Delta t \end{dcases}$$
+$$\begin{cases}p_{i+1/2} = p_{i-1/2} + F(r_{i-1})\Delta t \\ r_i = r_{i-1} + \frac{p_{i+1/2}}{m}\Delta t \end{cases}$$
 
 $$p_{i-1/2} =p_{i-1} + F(r_{i-1})\frac{\Delta t}{2}$$
 
 For clarity we shift the indices of the "real" $r$ variable, while keeping the indices of the auxiliary variable $p_{i\pm1/2}$.
 
-$$\begin{dcases}p_{i+1/2} = p_{i-1/2} + F(r_i)\Delta t \\ r_{i+1} = r_{i} + \frac{p_{i+1/2}}{m}\Delta t \end{dcases}$$
+$$\begin{cases}p_{i+1/2} = p_{i-1/2} + F(r_i)\Delta t \\ r_{i+1} = r_{i} + \frac{p_{i+1/2}}{m}\Delta t \end{cases}$$
 $$p_{i-1/2} =p_{i} + F(r_{i})\frac{\Delta t}{2}$$
 
 These formulas express leapfrog integration method.
