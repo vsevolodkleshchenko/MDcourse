@@ -29,7 +29,7 @@ Here $E$ is the energy of the system, which is considered constant in Hamiltonia
 - System volume $V$
 - Hamiltonian $H(q, p)$
 
-This system with dimension $6 N-3$ evolves according to its own laws of motion, which define the trajectory in phase space
+This system with dimension $6 N-3$ ($-3$ is because we are not interested in motion of the center-of-mass) evolves according to its own laws of motion, which define the trajectory in phase space
 
 $$
 \dot q_{\alpha} = \frac{\partial H}{\partial p_{\alpha}} \quad
@@ -187,15 +187,15 @@ However, there is another algorithm that allows you to obtain forces and velocit
 This method is based on the fact that it is possible to calculate the speeds at a half step:
 
 $$
-v(t + \frac{\Delta t}2) = \frac{r(t + \Delta t) - r(t)}{\Delta t} \\
-v(t - \frac{\Delta t}2) = \frac{r(t) - r(t - \Delta t)}{\Delta t}
+v\left(t + \frac{\Delta t}2\right) = \frac{r(t + \Delta t) - r(t)}{\Delta t} \\
+v\left(t - \frac{\Delta t}2\right) = \frac{r(t) - r(t - \Delta t)}{\Delta t}
 $$
 
 Then, from the known velocity at the half step, the coordinate at the next integer step is calculated:
 
 $$
-v(t + \frac{\Delta t}2) = v(t - \frac{\Delta t}2) + \frac{f(t)}{m} \Delta t^2 \\
-r(t + \Delta t) = r(t) + v(t + \frac{\Delta t}2) \Delta t
+v\left(t + \frac{\Delta t}2\right) = v\left(t - \frac{\Delta t}2\right) + \frac{f(t)}{m} \Delta t^2 \\
+r(t + \Delta t) = r(t) + v\left(t + \frac{\Delta t}2\right) \Delta t
 $$
 
 This method provides better accuracy and convenience, since there are no terms with a multiplier of $\Delta t^2$, and is also symmetric with respect to time inversion.

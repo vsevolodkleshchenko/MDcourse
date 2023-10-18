@@ -65,13 +65,13 @@ It turns out a differential equation with known initial conditions, the solution
 
 $$
 \frac{da}{dt} = i L a \quad t = 0: x_0 \\
-a(x(t)) = e^{iLt}a(x(t))
+a(x(t)) = \text{e}^{iLt}a(x(t))
 $$
 
 Based on the reflections above, it is possible to draw up a scheme for a numerical solution:
 
 $$
-x = \begin{pmatrix}q \\ p\end{pmatrix} \Rightarrow x(t) = e^{iLt}x(0)
+x = \begin{pmatrix}q \\ p\end{pmatrix} \Rightarrow x(t) = \text{e}^{iLt}x(0)
 $$
 
 To understand the usefulness of this formulation, we divide the Liouville operator into two parts corresponding to each of the terms in Poisson brackets:
@@ -96,45 +96,45 @@ $$
 From which it follows that (See Baker–Campbell–Hausdorff formula)
 
 $$
-e^{iL_1 + iL_2} \ne e^{iL_1} + e^{iL_2} 
+\text{e}^{iL_1 + iL_2} \ne \text{e}^{iL_1} + \text{e}^{iL_2} 
 $$
 
 Then it is necessary to use Trotter's theorem:
 
 $$
-e^{A+B} = \lim_{p \rightarrow \infty} \left[ e^{\frac{B}{2p}}e^{\frac{A}{p}}e^{\frac{B}{2p}}\right]^p
+\text{e}^{A+B} = \lim_{p \rightarrow \infty} \left[ \text{e}^{\frac{B}{2p}}\text{e}^{\frac{A}{p}}\text{e}^{\frac{B}{2p}}\right]^p
 $$
 
 In our case, instead of $p$, there will be $\frac{t}{\Delta t}= M$ - the number of steps
 
 $$
-e^{iLt} = e^{iL_1t +iL_2t} = \lim_{p \rightarrow \infty} \left[ e^{\frac{iL_2t}{2p}}e^{\frac{iL_1t}{p}}e^{\frac{iL_2t}{2p}}\right]^p = 
-\lim_{\Delta t \rightarrow 0} \left[ e^{\frac{iL_2 \Delta t}{2}}e^{iL_1 \Delta t}e^{\frac{iL_2 \Delta t}{2}}\right]^{\frac{t}{\Delta t}}
+\text{e}^{iLt} = \text{e}^{iL_1t +iL_2t} = \lim_{p \rightarrow \infty} \left[ \text{e}^{\frac{iL_2t}{2p}}\text{e}^{\frac{iL_1t}{p}}\text{e}^{\frac{iL_2t}{2p}}\right]^p = 
+\lim_{\Delta t \rightarrow 0} \left[ \text{e}^{\frac{iL_2 \Delta t}{2}}\text{e}^{iL_1 \Delta t}\text{e}^{\frac{iL_2 \Delta t}{2}}\right]^{\frac{t}{\Delta t}}
 $$
 
 For this limit , there is the following estimate:
 
 $$
-e^{iLt} = \left[ e^{\frac{iL_2 \Delta t}{2}}e^{iL_1 \Delta t}e^{\frac{iL_2 \Delta t}{2}}\right]^{M} + O(M\Delta t^3)
+\text{e}^{iLt} = \left[ \text{e}^{\frac{iL_2 \Delta t}{2}}\text{e}^{iL_1 \Delta t}\text{e}^{\frac{iL_2 \Delta t}{2}}\right]^{M} + O(M\Delta t^3)
 $$
 
 That is, the evolution of the system from the state at time $t$ to the state at time $t + \Delta t$ is given by the operator:
 
 $$
-e^{\frac{iL_2 \Delta t}{2}}e^{iL_1 \Delta t}e^{\frac{iL_2 \Delta t}{2}} + O(\Delta t^3)
+\text{e}^{\frac{iL_2 \Delta t}{2}}\text{e}^{iL_1 \Delta t}\text{e}^{\frac{iL_2 \Delta t}{2}} + O(\Delta t^3)
 $$
 
-Consider, for example, action of the operator $e^{iL_2\frac{\Delta t}{2}}$.
+Consider, for example, action of the operator $\text{e}^{iL_2\frac{\Delta t}{2}}$.
 Taylor series of an exponential function
 
 $$
-e^{c \frac{\partial}{\partial x}}g(x) = \sum \frac{1}{n!} c^n \frac{\partial^n g(x)}{\partial x^n} = g(x+c)
+\text{e}^{c \frac{\partial}{\partial x}}g(x) = \sum \frac{1}{n!} c^n \frac{\partial^n g(x)}{\partial x^n} = g(x+c)
 $$
 
 It turns out that in fact this operator acts as a shift, that is:
 
 $$
-e^{iL_2\frac{\Delta t}{2}} \begin{pmatrix} x \\ p\end{pmatrix} \rightarrow \begin{pmatrix} x \\ p  + \frac{F(x) \Delta t}{2} \end{pmatrix}
+\text{e}^{iL_2\frac{\Delta t}{2}} \begin{pmatrix} x \\ p\end{pmatrix} \rightarrow \begin{pmatrix} x \\ p  + \frac{F(x) \Delta t}{2} \end{pmatrix}
 $$
 
 Similarly, the $L_1$ operator will shift the position by coordinate.
@@ -225,7 +225,7 @@ One of the properties of such integrators is preservation on the total energy of
 
 When using the approximation
 
-$$\text{e}^{iLt}\approx \left(\text{e}^{iL_2\frac{\Delta t}{2}}\text{e}^{iL_1\Delta t}\text{e}^{iL_2\frac{\Delta t}{2}}\right)^M = \text{e}^{i\widetilde{L}t}$$
+$$\text{e}^{iLt}\approx \left[\text{e}^{iL_2\frac{\Delta t}{2}}\text{e}^{iL_1\Delta t}\text{e}^{iL_2\frac{\Delta t}{2}}\right]^M = \text{e}^{i\widetilde{L}t}$$
 
 it turns out that the system numerically evolves not with the original operator $L$, but with some $\widetilde{L}$, which corresponds to some Hamiltonian $\widetilde{H}$ not equal to the original $H$.
 The difference between $\widetilde{H}$ and $H$ determines the order of the symplectic integrator.
@@ -237,7 +237,7 @@ and using the same approach as for velocity-Verlet method above.
 It can be proven that in this case effective Hamiltonian differs from $H$ by some term proportional to $\Delta t$: $\widetilde{H}=H + O(\Delta t)$.
 For velocity-Verlet method, which is second-order method, $\widetilde{H}=H + O(\Delta t^2)$.
 
-Symplectic methods can be combined with each other to obtain high-order integrator and to get $\widetilde{L}$ closer to $L$
-Foe example, [in this work](https://doi.org/10.1016/0375-9601(90)90092-3) the method of designing symplectic integrators of 4, 6 and 8 orders is presented.
+Symplectic methods can be combined with each other to obtain high-order integrator and to get $\widetilde{L}$ closer to $L$.
+For example, [in this work](https://doi.org/10.1016/0375-9601(90)90092-3) the method of designing symplectic integrators of 4, 6 and 8 orders is presented.
 The 4th order integrator requires multiplication of 7 matrix exponentials.
 As the order of the integrator increases, the formulas for one step grow.
