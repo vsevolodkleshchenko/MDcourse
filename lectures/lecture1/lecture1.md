@@ -75,10 +75,12 @@ However, it is necessary to ensure that the space path is sufficient to calculat
 These problems need to be dealt with individually, based on the data obtained.
 
 ### What does the algorithm look like?
+![Algorithm](images/algorithm.png)
+
 The process can be described in the following steps:
 
 1. Definition of the system, including the initial position $x_0$
-2. Calculation of forces $F_i(x)$ acting on particles at the $i$th step
+2. Calculation of forces $F_i(x)$ acting on particles at the $i$-th step
 3. Obtaining new positions based on the calculated forces by integrating the equations of motion $x_i\rightarrow x_{i+1}$
 4. Calculation of the values of the observed quantities $a(x)$ 
 
@@ -109,6 +111,9 @@ The method proposed above is not reversible in time, since there is clearly no s
 
 
 ### Velocity-Verlet method
+
+![Velocity-Verlet method](images/fig2_velverlet.png)
+
 Let's try to describe a method that takes into account the fact that when switching to calculating the velocities of $v$ at time $t+\Delta t$, the position of $r(t+\Delta t)$, and hence the force of $F(r(t+\Delta t))$ are already known. 
 
 Denote $F(r(t)) = f(t)$, then:
@@ -151,6 +156,8 @@ That is Verlet algorithm.
 
 ## Verlet method
 
+![Verlet method](images/fig3_verlet.png)
+
 Let's get it independently, from the Taylor series expansion:
 
 $$
@@ -182,7 +189,9 @@ It is necessary to store forces, coordinates at the previous and current time st
 
 However, there is another algorithm that allows you to obtain forces and velocities almost simultaneously and which generates the same sequence of coordinates.
 
-## Leapfrog Verlet
+## Leap-frog Verlet
+
+![Leap-frog method](images/fig4_leapfrog.png)
 
 This method is based on the fact that it is possible to calculate the speeds at a half step:
 
@@ -214,7 +223,5 @@ The algorithms above conserve energy well, while it is important to preserve it 
 It turns out these are two very different conditions.
 
 Also note that since the system is Hamiltonian, a small change in energy means that the points of the trajectory obtained using the algorithm do not depart far from the hypersurface given by the function $\delta(H(p, q) - E)$. And this is something that is not required for an arbitrary solution of the differential equation.
-
-![hypersurface](images/fig2_hypersurface.svg)
 
 
