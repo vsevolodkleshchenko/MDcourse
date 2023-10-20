@@ -1,29 +1,48 @@
-# Периодические граничные условия
+# Periodic boundary conditions
 
-Система моделируемых молекул должна быть ограничена в объеме, иначе со временем все частицы разлетятся на бесконечность.
-Одним из вариантов граничных условий являются периодические граничные условия.
-Для их использования рассматривается некоторая ограниченная система молекул, вокруг которой выставлены периодические граничные условия. 
-Выделение подсистемы возможно, если взаимодействие молекул локализовано, то есть оно короткодействующее, а корреляционная длина мала.
-Чаще всего это верно, например потенциал Леннарда-Джонса удовлетворяет такому условию, а Кулона — нет.
+The simulated system must be limited in volume, otherwise all particles will eventually fly from each other to infinity.
+One of the ways to limit the system is to introduce periodic boundary conditions.
+In this case the system turns out to be sort of infinite.
 
-# Расчет сил
+The usage of periodic boundary conditions is possible if only the interaction between molecules is short-range and strongly localized.
+For example, Lennard-Jones potential satisfies this condition
 
-Чтобы рассчитать силы, действующие на молекулу при использовании периодических граничных условий, необходимо учитывать ее взаимодействие со всеми молекулами в подсистеме и со всеми молекулами всех изображений данной подсистемы. 
-Однако в случае короткодействующих потенциалов можно считать взаимодействие только с теми молекулами, которые находятся на расстоянии меньше характерного расстояния взаимодействия.
-При этом важно, чтобы это характерное расстояние было меньше характерного размера $r_c$ подсистемы.
+$$
+U(r) = 4\epsilon\left[\left(\frac{\sigma}{r}\right)^{12} - \left(\frac{\sigma}{r}\right)^6\right]
+$$
 
-![Схема](images/fig3_draft.png)
+![Lennard-Jones potential](images/LJ_potential.png)
 
-При этом элементарная ячейка не обязаны быть кубической, она может иметь любую другую форму.
+## Minimum-image convention
+
+When using periodic boundary conditions, it is necessary to consider interactions with molecules not only within a single cell, but also among all copies of the cell.
+However, in the case of short-range interactions one can consider the interaction only with those images of molecules which are at a distance smaller than the characteristic distance $r_c$.
+This approximation is called minimum-image convention.
+Maintenance of the minimum-image convention requires that the characteristic distance is smaller than the half characteristic size $L$ of the cell.
+
+![Scheme](images/scheme.png)
+
+The simulated cell does not have to be cubic, any unit cell can be used. 
+Other unit cells can be used to reduce the number of particles that are located somewhere in the corners of the simulated cell and are not involved in the process of interest.
 
 ![Элементарные ячейки](images/fig4_draft.png)
 
-Это можно использовать для уменьшения числа частиц, которые находятся где-то в углах объема подсистемы и не участвуют в интересующем процессе.
+Межмолекулярные взаимодействия необходимо обрезать, чтобы ускорить расчет.
+Рассмотрим варианты обрезания.
+1. Просто обрезать на расстоянии $r_c$.
+Потенциал при $r>r_c$ считается нулем.
+В таком случае возникает проблема с силами, которые являются производной потенциала: силы будут испытывать скачок, что не соответствует физике. 
+1. Чтобы избежать этого, можно приподнять потенциал так, чтобы убрать ступеньку в потенциальной энергии.
+Однако это приведет к тому, что поменяется энергетический баланс в системе и моделируемый потенциал будет сильно отличатся от реального. 
+1. Добавим дифференцируемую переходную функцию на некотором интервале $[r_c, r_i]$.
+Получается потенциал, не обладающий недостатками, указанными выше.
 
-# Другие граничные условия
+![Потенциал](images/fig6a.png)
 
-1. **Открытые граничные условия**.
-Условия, при которых частицы, достигшие границы системы, исключаются из расчета.
+# Other boundary conditions
+
+1. **Open boundary conditions**.
+In this case, if a molecule reaches a boundary, it will be removed from simulation. 
 Могут быть использованы для моделирования капли какого-нибудь вещества в свободном пространстве.
 Со временем число молекул в такой капле будет уменьшатся, что может негативно сказываться на результате расчета.
 1. **Вакуум**.
@@ -45,17 +64,7 @@
 ![Потенциалы](images/fig5.png)
 Levitt, M. (2001). The birth of computational structural biology. Nat. Struct. Biol., 8, 392–393. doi: 10.1038/87545
 
-Межмолекулярные взаимодействия необходимо обрезать, чтобы ускорить расчет.
-Рассмотрим варианты обрезания.
-1. Просто обрезать на расстоянии $r_c$.
-Потенциал при $r>r_c$ считается нулем.
-В таком случае возникает проблема с силами, которые являются производной потенциала: силы будут испытывать скачок, что не соответствует физике. 
-1. Чтобы избежать этого, можно приподнять потенциал так, чтобы убрать ступеньку в потенциальной энергии.
-Однако это приведет к тому, что поменяется энергетический баланс в системе и моделируемый потенциал будет сильно отличатся от реального. 
-1. Добавим дифференцируемую переходную функцию на некотором интервале $[r_c, r_i]$.
-Получается потенциал, не обладающий недостатками, указанными выше.
 
-![Потенциал](images/fig6a.png)
 
 # Выводы
 
