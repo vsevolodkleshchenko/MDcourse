@@ -1,141 +1,143 @@
-# Lecture 4
+# Lecture 4. Controlling temperature
 
-# NVE ensemble
-Рассмотрим систему в которой взаимодействие частиц определяется силами $f(r_{ij})$. В рассматриваемой системе будет постоянное число частиц $N$, объем системы $V$ и энергия $E$. Объем системы будет учитываться с помощью периодических граничных условий, и для Гамильтониана можно записать:
+## NVE and NVT ensembles
+Consider a system in which the interaction of particles is determined by forces $f(r_{ij})$. In this system there will be a constant number of particles $N$, the volume of the system $V$ and the energy $E$ (total isolation), i.e. `microcanonical ensemble`. The volume of the system will be taken into account using for example periodic boundary conditions.
+
+For the Hamiltonian we can write:
 
 $$
 H(p, r) \rightarrow 
 \begin{cases}
-\dot p = \dots \\
-\dot q = \dots
+\dot p = - \frac{\partial H}{\partial q} \\
+\dot q =  \frac{\partial H}{\partial p}
 \end{cases}, \quad
 H(p, r) = E
 $$
 
-С точки зрения термодинамики вычисляются средние величины с учетом эргодичности:
+In thermodynamics, assuming ergodicity, average value of some quantity $a$ can be found as following:
 
 $$
 \left<a(x)\right> = \frac{\int dx a(x) \delta(H(x) - E_0)}
 {\int dx \delta(H(x) - E_0)} = \frac1T \int_0^T a(x(t)) dt
-\approx \frac1M\sum_{n=1}^M a(n\Delta t)
+\approx \frac1M\sum_{n=1}^M a(n\Delta t),
 $$
 
-Где $x= \begin{cases} r \\ p \end{cases}$, $M$ - число шагов.
+where $x= \begin{pmatrix} r \\ p \end{pmatrix}$, $M$ - the number of time steps $\Delta t$.
 
-В реальной природе всегда есть термодинамическая баня. Обычно предполагается что есть меньшая подсистема в некоторой большой системе, которая обменивается с ней теплом, в результате чего есть некоторая температура $T$ и на каждую степень свободы приходится энергия $\frac{kT}2$.
+However, in the real system there is always a thermodynamic bath. Also, it is usually assumed that there is a smaller subsystem in some large system that exchanges heat with it, and as a result there is a temperature $T$. Therefore we would like to explicitly sample the `canonical ensemble` (NVT). For this purpose we need to be able to control the temperature of our
+system.
 
-Среднее по распределению Больцмана:
+## Velocity rescaling
+ We already know that every degree of freedom has energy $\frac{kT}2$. 
+The average of the Boltzmann distribution:
 
 $$
 \left<a(x)\right> = \frac{
     \int dx a(x) \exp(-\frac{\frac{p^2}{2m} + U(r)}{kT})}{
-    \int dx \exp(-\frac{\frac{p^2}{2m} + U(r)}{kT})}
+    \int dx \exp(-\frac{\frac{p^2}{2m} + U(r)}{kT})} = 
 \frac1T \int_0^T a(x(t))
 $$
 
-Для импульса есть распределение Максвела:
-
+For $p$ we use Maxwell distribution:
 $$
 f(p) = \left(\frac1{2\pi nkT}\right)^{3/2}\exp\left(-\frac{p^2}{2mkT}\right)
 $$
 
-Окуда получается момент этого распределения:
+and the momentum of this distribution can be obtained:
 
 $$
-\Rightarrow \frac{3kT}2 = \frac{m\left<|v|^2\right>}2 \quad \rightarrow  \quad \left<p^2\right> = 3kTm, \left<p^4\right> = 15(kTm)^2
+\frac{3kT}2 = \frac{m\left<|v|^2\right>}2 \quad \rightarrow  \quad \left<p^2\right> = 3kTm, \left<p^4\right> = 15(kTm)^2
 $$
 
-Давайте держать среднюю скорость такой, то есть делать rescaling скоростей. Тогда получится некоторая другая система с нужной кинетической энергией, в которой будет неправильно то что она не будет гарантировать вот этого распределения. 
+If we want to keep the average speed, then we can do `velocity rescaling`. However, we should note, that as the result we may obtain another system with specified kinetic energy but wrong distribution.
 
-Самое простое это посмотреть на относительные флуктуации квадрата импульса $\frac{\sigma_{p^2}}{\left<p^2\right>^2}$ и всей кинетической энергии (кинетическая температра) $\frac{\sigma_{T_k}^2}{\left<T_k^2\right>^2}$.
+The simplest way is to check the relative fluctuations of the square of the momentum $\frac{\sigma_{p^2}}{\left<p^2\right>^2}$ and total kinetic energy (kinetic temprature) $\frac{\sigma_{T_k}^2}{\left<T_k^2\right>^2}$.
 
-Тогда квадрат скорости любой молекулы флуктуирует как:
+Then the square of the velocity of any molecule fluctuates as:
 
 $$
 \frac{\sigma_{p^2}}{\left<p^2\right>^2} = \frac{\left<p^4\right> - \left<p^2\right>^2}{\left<p^2\right>^2} = \frac{15-9}{9} = \frac23
 $$
 
-И кинетическая температура, которая определяется как $\left<\sum\frac{mv^2}2\right> = \frac{3NkT}2$.
+And for kinetic temperature, which is defined as
+$\left<\sum\frac{mv^2}2\right> = \frac{3NkT}2$:
 
 $$
 T_k \sim \frac1N \sum p_i^2, \quad 
-\left<T_k\right> \sim \frac1N \sum\left<p_i\right>^2 = \left<p^2\right>\\
-\rightarrow \quad \left<T_k^2\right> \sim \frac1{N^2} \left<\left(\sum p_i^2\right)\right> = \frac1{N^2}\left(N\left<p^4\right> + N(N-1)\left<p^2\right>\left<p^2\right>\right)
+\left<T_k\right> \sim \frac1N \sum\left<p_i\right>^2 = \left<p^2\right> \rightarrow \\
+ \quad \left<T_k^2\right> \sim \frac1{N^2} \left<\left(\sum p_i^2\right)\right> = \frac1{N^2}\left(N\left<p^4\right> + N(N-1)\left<p^2\right>\left<p^2\right>\right)
 $$
 
-Тогда 
+Then 
 
 $$
 \frac{\sigma_{T_k}}{\left<T_k\right>^2} = \frac{\left<T_k^2\right> - \left<T_k\right>^2}{\left<p^2\right>^2} = \frac1{N^2} 
 \frac{\frac1{N^2}\left(N\left<p^4\right> + N^2\left<p^2\right>^2 - N\left<p^2\right>\right) - \left<p^2\right>^2}{\left<p^2\right>^2} = \\ = \frac{\left<p^4\right> - \left<p^2\right>^2}{N\left<p^2\right>^2} = \frac2{3N}
 $$
 
-Тогда если необходимо следить за температурой, нужно заботиться о том что бы все моменты были правильными. Соответственно если мы сделали метод который среднее будет держать постоянным, то вариация у него $0$.
+If we need to control the temperature, it is necessary to take care that all the moments are correct. Accordingly, if we have made a method that will keep the average value constant, then the variation is $0$.
 
-Таким образом пользоваться можно только методами в которых доказано что все остается правильным.
+Thus, you can use only methods in which it is proved that everything remains correct.
 
-- isokinetic method: сумма квадратов постоянна: 
-$$
-\left<p^2\right> = 0 \quad\Rightarrow\quad \sigma_{T_k} = 0
-$$
+- `Isokinetic method`: the sum of squares is constant. This is not very good method, because if $\left<p^2\right> = 0$ then $\sigma_{T_k} = 0 $ 
 
-Далее существует лучшие методы, которые условно можно разделить на два класса
+Further, there are better methods that can be conditionally divided into two classes:
 
-- Anderson method: Давайте будем периодически случайные удары о молекулы вводить в систему.В какой-то момент импульс какой то молекулы меняется, при чем так что распределение остается правильным
-- Anderson : чтобы наша система сэмплировала не постоянную энергию а по распределению при этом динамика сохранялась
+- Stochastic methods: In `Stochastic collisions` (`Anderson thermostat`) method periodically random impacts on molecules into the system are introduced. At some point, the momentum of some molecule changes, so that the distribution remains correct.
+- Extended methods: for example `Nose-Hoover thermostat`, where system samples not constant energy, but by distribution, while the dynamics are reserved.
+
 $$
 \delta(E-H(p, r)) \quad\rightarrow\quad \exp(-\frac{H(p(r))}{kT})
 $$
 
-Ткаим образом, постановка задачи: мы хотим в нашей системе из $N$ атомов (возможно с периодическими граничными условиями) каким -то образом получать одно за другим состояния (сэмплировать), так чтобы получалсь среднее именно в понимании $NVT$:
+Thus, we can formulate the statement of the problem: we want to obtain somehow one state after another (sample) in our system of $N$ atoms (possibly with periodic boundary conditions) so that the average is obtained precisely in the understanding of $NVT$:
+
 $$
 \left<a(x(t))\right> = \frac1M \sum_{n=1}^M a(n\Delta t) = 
 \frac{\int dx a(x) \exp(-\frac{H(x)}{kT})}{\int dx \exp(-\frac{H(x)}{kT})} = \left<a(x)\right>_{NVT}
 $$
 
-Все последующие алгоритмы называются термостатами, поскольку они приводят к тому что у системы есть постоянная темепература.
+All theese algorithms are called thermostats because they result in a constant temperature being maintained in the system.
 
-### Первый подход
+## Stochastic collisions
 
-Давайте раз в какое то время с вероятностью $\nu$ $([\nu] = 1/s)$ гипотетически с частицей что-то сталкивается, так что ее скорость изменяется как $v \rightarrow v_M$, где $v_M$ - скорость из распредеелния Максвела $f(v)$. Утверждается, что этого достаточно.
+Let's assume that periodically with probability $\nu$ $([\nu] = 1/s)$ something collides with the particle, so that its velocity changes as $v\rightarrow v_M$, where $v_M$ is the velocity from the Maxwell distribution $f(v)$.
 
-С алгоритмической точки зрения:
-
-рассмотри изменние система из нулевого момента времения на шаг $\Delta t$:
+From an algorithmic point of view, let's consider the change of the system when moving from the $0$ moment of time to  $\Delta t$:
 
 $$
 \left[r^n(0), p^n(0) \right] \rightarrow \left[r^n(\Delta t), p^n(\Delta t) \right]
 $$
 
-Тогда сталквиание будет работать так
+Then the colliding will work as follows:
 
 ```
 for i in range(1, N):
-    if test():
+    if is_reached():
         v[i] = Gauss()  # Maxvell distribution
 ```
-где `test()` - достигла ли величина $\nu \Delta t$ достаточного значения для применения столкновения.
+where `is_reached` - is a function that determines has the value of $\nu\Delta t$ reached a sufficient value to apply the collision.
 
-Преимущества:
-- Простой
-- Дает правильно распределение
+Advantages:
+- Simple
+- Сorrect distribution is maintained
 
-Минусы:
-- Потеряна динамика: корреляционная функция скоростей будет экспоненциально спадать $\left<v(0)v(t)\right> \sim \exp(-\nu t)$.
+Disadvantages:
+- Lost dynamics: the velocity correlation function must decrease exponentially $\left<v(0)v(t)\right> \sim \exp(-\nu t)$
 
-### Второй подход Nose-Hoover
-Хочется получить метод который также будет ходить между плоскостями, но при этом будет сохраняться динамика.
+## Nose-Hoover thermostat
+<!-- Also, we want to get a method that will also 'walk between planes', but at the same time the dynamics will be preserved. -->
+We want to get such a method that the dynamics will be preserved. To achieve it, the system can be expanded by adding a variable $s$ that scales velocities.
 
-Для этого можно расширить систему, добавив переменную $s$, скалирующую скорости.
+Consider the Lagrangian:
 
-Рассмотрим Лагранжиан:
 $$
 \mathcal{L}_{Nose} = \sum_{i=2}^n \frac{m_i}2 (s\dot r_i^2) - U(r_N) + \frac{Q}2 \dot s ^2 - LkT \ln s
 $$
 
-$Q$ - аналог массы, задающий инерцию для координаты, $L$ - константа, смысл которой будет понятен позже.
+Here $Q$ is an analogue of mass, $L$ is a constant, the meaning of which will be understood later.
 
-Теперь для перехода к Гамильтониану с $6N + 2$ степенями свободы:
+Now, to move on the Hamiltonian with $6N +2$ degrees of freedom:
 $$ 
 \begin{cases}
     p_i = \frac{\partial \mathcal{L}}{\partial \dot r_i} = m_i s^2 \dot r_i \\
@@ -144,20 +146,22 @@ $$
 H = \sum \frac{p_i^2}{2m_is} + U(r^N) + \frac{p_s^2}Q + L kT\ln s
 $$
 
-Посмотри, как будет происходить интегрирование и вычисление средних исходя из него. Рассмотрим статсумму
+Let's see how the integration and calculation of averages will take place based on it. Consider the partition function:
 
 $$
 Q_N = \frac1N\int dp_s ds dp^N dr^N \delta (H_N(s, p_s, p, r) - E)
 $$
 
-Вводя $p' = \frac{p}{s}$ и $H'(p, r) = \sum \frac{p_i'^2}{2m_is} + U(r^N)$, получим
+Introducing $p' = \frac{p}{s}$ и $H'(p, r) = \sum \frac{p_i'^2}{2m_is} + U(r^N)$, we obtain:
 
 $$
 Q_N = \frac1N\int dp_s ds dp'^N dr^N s^{3N} \delta \left(
     H'(p, r) + \frac{p_s^2}Q + L kT\ln s \right) = \\
 \frac1N\int dp_s ds dp'^N dr^N s^{3N} \delta \left[LkT\left(\ln s  - \frac{-H'(p, r) - \frac{p_s^2}Q - E}{LkT} \right) \right]
 $$
-Обозначим $\ln(s_0) = \frac{-H'(p, r) - \frac{p_s^2}Q - E}{LkT}$ и проинтегрируем 
+
+Denote $\ln(s_0) = \frac{-H'(p, r) - \frac{p_s^2}Q - E}{LkT}$ then integration will be as follows:
+
 $$
 Q_N = \frac1N\int\dots ds s^{3N} \delta \left(LkT\ln(\frac{s}{s_0})\right) = \frac1N\int ds \frac{s_0^{3N+1}}{LkT} dp_s dp'^N dr^N = \\
 = \frac1{N!LkT}\int dp_s dp'^N dr^N \exp\left(
@@ -165,13 +169,15 @@ Q_N = \frac1N\int\dots ds s^{3N} \delta \left(LkT\ln(\frac{s}{s_0})\right) = \fr
 Q_N = \frac{c}{N!}\int dp'^N dr^N \exp\left(
     -\frac{3N+1}{L} \frac{H(p', r) + p_s^2/Q - E}{kT} \right) 
 $$
-Если выбрать $L=3N+1$ то и получится то что нужно.
 
-Получается что среднее значение какой то функции по траектории
+If we take $L=3N+1$ then we will get what we need. It turns out that the average value of some function along the trajectory is
+
 $$
 A(p', r) = \lim_{T\rightarrow\infty}\int_0^T dt A\left(\frac{p(t)}{s(t)}, r(t)\right) = \left<A\left(\frac{p}{s}, r\right)\right>
 $$
-а по распределению получается реально как среднее по ансамблю:
+
+and the average value of the distribution is actually obtained the same as the average of the ensemble:
+
 $$
 \left<A\left(\frac{p}{s}, r\right)\right>_{Nose} = \frac{
     \int dp'^N dr^N A\left(p', r\right) \exp\left(-\frac{H(p', r)}{kT} \right)}{
@@ -179,13 +185,14 @@ $$
 \left<A\left(p', r\right)\right>_{NVT}
 $$
 
-Что здесь реальное, а что здесь построение? С учетом всех переменных, из формы Лагранжиана, когда мы его расширяем, можно получить что $\dot r '= s\dot r$  и время шкалируется в зависимости от $s$:
+Taking into account all variables, when we expand the Lagrangian, using its form, we can get that $\dot r '= s\dot r$ and the time is scaled depending on $s$:
 
 $$
 dt' = \frac{dt}{s} 
 $$
 
-Рассмотрим среднее и будем интегрировать по штрихованному времени, чтобы переехать в штрихованное время и ничего не испортить, т.е жить в тех координатах которые не растянуты и при этом выполняется правильное распределение по импульсам.
+Consider the mean value. We will integrate according to the scaled time so that not to spoil anything, and to obtain correct distribution.
+
 $$
 \lim_{T'\rightarrow\infty} \frac1{T'}\int_0^{T'} dt' A\left(\frac{p(t')}{s(t')}, r(t') \right) = 
 \lim_{T'\rightarrow\infty} \frac{T}{T'} \frac1{T} \int_0^{T} dt A\left(\frac{p(t)}{s(t)}, r(t)\right) \frac1{s(t)} = \\
@@ -194,7 +201,9 @@ $$
     \lim_{T'\rightarrow\infty} \frac1{T}\int_0^T\frac{dt}{s(t)} 
 } = \frac{\left<\frac{A}{s}\right>}{\left<\frac1{s}\right>}
 $$
-В итоге получается не то что мы хотели: 
+
+As a result, we obtain not what we wanted:
+
 $$
 \bar A = \lim_{T'\rightarrow\infty} \frac1{T'}\int_0^{T'} dt' A\left(\frac{p(t')}{s(t')}, r(t') \right) = 
 \frac{\left<A\left(\frac{p}{s}, r\right)\frac1{s}\right>}{\left<\frac1{s}\right>} = \\ =
@@ -203,9 +212,10 @@ $$
 \left<A\left(p', r\right)\right>_{NVT} \bigg|_{L=3N}
 $$
 
-Тем не менее получается, что вдоль штрихованной координаты получается нужный ансамбль
+Nevertheless, it turns out that the desired ensemble is obtained along the scaled coordinate
 
-Если хотим записать без штрихованных коррдинат, то нужно записать уравнения Гамильтоновой механики. Для прямых координат:
+If we want to derive it without scaled coordinates, then we need to use the equations of Hamiltonian mechanics. For straight coordinates:
+
 $$
 \begin{cases}
 \frac{dr_i}{dt} = \frac{p_i}{m_is^2} \\
@@ -217,12 +227,12 @@ $$
 \end{cases}
 $$
 
-При этом видно, что 
+It can be seen that
 $$
 \frac1{s} \left( \sum \frac{p_i^2}{m_is^2} - LkT \right) \bigg|_{L=3N} \sim 2 \frac{\sum p_i'^2}{2m} \rightarrow 3NkT
 $$
 
-Теперь для штрихованных координат:
+Now, for the scaled coordinates:
 $$
 \begin{cases}
 \frac{dr'_i}{dt} = \frac{p'_i}{m_is^2} \\
@@ -234,12 +244,13 @@ $$
 \end{cases}
 $$
 
-Это преобразование Гамильтоновых уравнений сохраняет величину
+This transformation of the Hamiltonian equations preserves the considered value
+
 $$
 H'_{Nose} = \sum \frac{p_i^2}{m_is^2} + U(r')+\frac{s' p_s'^2}{2Q}+3NkT\ln s
 $$
 
-Если ввести величину $\xi=\frac{s'p'_s}{Q}$, то получаем:
+Introducing $\xi=\frac{s'p'_s}{Q}$, we can obtain:
 $$
 \begin{cases}
 \dot r_i' = \frac{p_i'}{m_i} \\
@@ -247,13 +258,5 @@ $$
 \dot \xi = \left(\sum\frac{p_i}{m_i}- 3NkT\right)\frac1{Q} \sim T_k-T_0
 \end{cases}
 $$
-Заметим что $s$ тут уже не учитываетсяВ
 
-<!-- $$
-\begin{cases}
-r' = r \\ p' = \frac{p}{s} \\ s' = s \\ p_s' = p_s
-\end{cases} \rightarrow
-v' = \frac{v}{s} \rightarrow \frac{dr'}{dt'} = \frac{dr}{dt\cdot s} 
-\Rightarrow
-dt' = \frac{dt}{s(t)}
-$$ -->
+Note that $s$ is no longer taken into account here. In the scaled coordinates we get the average of the desired ensemble.
