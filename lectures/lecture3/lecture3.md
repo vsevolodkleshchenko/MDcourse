@@ -1,4 +1,6 @@
-# Periodic boundary conditions
+# Lecture 3
+
+## Periodic boundary conditions
 
 The simulated system must be limited in volume, otherwise all particles will eventually fly from each other to infinity.
 One of the ways to limit the system is to introduce periodic boundary conditions.
@@ -13,7 +15,7 @@ $$
 
 ![Lennard-Jones potential](images/LJ_potential.png)
 
-## Minimum-image convention
+### Minimum-image convention
 
 When using periodic boundary conditions, it is necessary to consider interactions with particles not only within a single cell, but also among all copies of the cell.
 However, in the case of short-range interactions one can consider the interaction only with those images of particles which are at a distance smaller than the characteristic distance $r_c$.
@@ -27,7 +29,7 @@ Other unit cells can be used to reduce the number of particles that are located 
 
 ![Unit cells](images/truncated.png)
 
-## Cutting of the interaction
+### Cutting of the interaction
 
 There are several ways to cut interactions.
 1. **Cutting off the potential** at $r_c$.
@@ -41,7 +43,7 @@ The resulting potential does not have the disadvantages and problems mentioned a
 
 ![Потенциал](images/fig6a.png)
 
-# Other boundary conditions
+## Other boundary conditions
 
 1. **Open boundary conditions**.
 In this case, if a particle reaches a boundary, it will be removed from simulation. 
@@ -58,7 +60,7 @@ These are conditions under which particles are elastically pushed away from the 
 The limited volume of the system causes some effects. If fixed boundary conditions are used, there is an effective surface tension in the system, so this system becomes a nanodrop.
 In case of using periodic boundary conditions this does not happen.
 
-# Empirical potentials
+## Empirical potentials
 
 It is necessary to specify the potential energy in order to calculate the forces. In molecular dynamics, the potential energy is obtained semiempirically using experimental data and quantum mechanical calculations.
 
@@ -67,7 +69,7 @@ Potential energy is the sum of potential energies of stretching, bending, torsio
 ![Потенциалы](images/fig5.png)
 Levitt, M. (2001). The birth of computational structural biology. Nat. Struct. Biol., 8, 392–393. doi: 10.1038/87545
 
-# Neighbor list for short range interactions
+## Neighbor list for short range interactions
 
 To check which particles interact, i.e. that the distance between them is less than $r_c$, it is needed to make $O(N^2)$ checks.
 To speed up the calculations, we can construct Verlet lists.
@@ -75,7 +77,7 @@ For each particle a list of other particles that are closer than $r_c$ and a lis
 At each step only the interactions between a particle and particles in its Verlet list are checked, and only once every several steps lists are reconstructed.
 The number of checks is reduced to $O(N)$.
 
-# Conclusion
+## Conclusion
 
 To run the simulation:
 1. setup the system:
