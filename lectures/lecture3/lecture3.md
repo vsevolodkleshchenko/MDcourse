@@ -1,67 +1,85 @@
-# Периодические граничные условия
+# Periodic boundary conditions
 
-Система моделируемых молекул должна быть ограничена в объеме, иначе со временем все частицы разлетятся на бесконечность.
-Одним из вариантов граничных условий являются периодические граничные условия.
-Для их использования рассматривается некоторая ограниченная система молекул, вокруг которой выставлены периодические граничные условия. 
-Выделение подсистемы возможно, если взаимодействие молекул локализовано, то есть оно короткодействующее, а корреляционная длина мала.
-Чаще всего это верно, например потенциал Леннарда-Джонса удовлетворяет такому условию, а Кулона — нет.
+The simulated system must be limited in volume, otherwise all particles will eventually fly from each other to infinity.
+One of the ways to limit the system is to introduce periodic boundary conditions.
+In this case the system turns out to be sort of infinite.
 
-# Расчет сил
+The usage of periodic boundary conditions is possible if only the interaction between particles is short-range and strongly localized.
+For example, Lennard-Jones potential satisfies this condition
 
-Чтобы рассчитать силы, действующие на молекулу при использовании периодических граничных условий, необходимо учитывать ее взаимодействие со всеми молекулами в подсистеме и со всеми молекулами всех изображений данной подсистемы. 
-Однако в случае короткодействующих потенциалов можно считать взаимодействие только с теми молекулами, которые находятся на расстоянии меньше характерного расстояния взаимодействия.
-При этом важно, чтобы это характерное расстояние было меньше характерного размера $r_c$ подсистемы.
+$$
+U(r) = 4\epsilon\left[\left(\frac{\sigma}{r}\right)^{12} - \left(\frac{\sigma}{r}\right)^6\right]
+$$
 
-![Схема](images/fig3_draft.png)
+![Lennard-Jones potential](images/LJ_potential.png)
 
-При этом элементарная ячейка не обязаны быть кубической, она может иметь любую другую форму.
+## Minimum-image convention
 
-![Элементарные ячейки](images/fig4_draft.png)
+When using periodic boundary conditions, it is necessary to consider interactions with particles not only within a single cell, but also among all copies of the cell.
+However, in the case of short-range interactions one can consider the interaction only with those images of particles which are at a distance smaller than the characteristic distance $r_c$.
+This approximation is called minimum-image convention.
+Maintenance of the minimum-image convention requires that the characteristic distance is smaller than the half characteristic size $L$ of the cell.
 
-Это можно использовать для уменьшения числа частиц, которые находятся где-то в углах объема подсистемы и не участвуют в интересующем процессе.
+![Scheme](images/scheme.png)
 
-# Другие граничные условия
+The simulated cell does not have to be cubic, any unit cell can be used. 
+Other unit cells can be used to reduce the number of particles that are located somewhere in the corners of the simulated cell and are not involved in the process of interest.
 
-1. **Открытые граничные условия**.
-Условия, при которых частицы, достигшие границы системы, исключаются из расчета.
-Могут быть использованы для моделирования капли какого-нибудь вещества в свободном пространстве.
-Со временем число молекул в такой капле будет уменьшатся, что может негативно сказываться на результате расчета.
-1. **Вакуум**.
-Эти граничные условия накладывают ограничения на интерпретацию результатов. 
-Используются для моделирования единичных молекул, однако в эксперименте такие молекулы будут находится в каком-нибудь растворителе, с молекулами которого они взаимодействует.
-Это приводит к тому, что, например, спектр молекул в эксперименте будет отличатся от найденного численно.
-1. **Граничные условия твердой стенки**. 
-Условия, при которых молекулы упруго отталкиваются от границы.
-При этом возникают проблемы с эффектами, связанными с размерами системы.
-В случае использования жестких граничных условий получается, что в системе существует эффективное поверхностное натяжение, а сама рассматриваемая подсистема становится нанокаплей. 
-В случае использования периодических граничных условий этого не происходит.
+![Unit cells](images/truncated.png)
 
-# Потенциалы
+## Cutting of the interaction
 
-Чтобы считать силы, необходимо задать потенциальную энергию.
-В молекулярной динамике потенциальная энергия получается полуэмпирически с использованием экспериментальных данных и квантовомеханических расчетов.
+There are several ways to cut interactions.
+1. **Cutting off the potential** at $r_c$.
+Potential is considered to be equal zero when $r>r_c$.
+It this case the force equal to derivative of the potential $$F(r) = -\frac{\partial U}{\partial r}$$ has an unphysical "jump", discontinuity in at $r_c$.
+1. To avoid this, you can **shift the potential** removing the step in the potential.
+However, this will lead to changes in the energy balance of the simulated system, since the shifted potential is very different from the real one.
+1. Another solution is to add some **smooth switch function** on interval $[r_c, r_i]$.
+The resulting potential does not have the disadvantages and problems mentioned above.
 
-Потенциальная энергия является суммой потенциальных энергий растяжения, изгиба, кручения межатомных связей в молекуле, энергий межмолекулярного взаимодействия и энергий электростатического взаимодействия 
-![Потенциалы](images/fig5.png)
-Levitt, M. (2001). The birth of computational structural biology. Nat. Struct. Biol., 8, 392–393. doi: 10.1038/87545
-
-Межмолекулярные взаимодействия необходимо обрезать, чтобы ускорить расчет.
-Рассмотрим варианты обрезания.
-1. Просто обрезать на расстоянии $r_c$.
-Потенциал при $r>r_c$ считается нулем.
-В таком случае возникает проблема с силами, которые являются производной потенциала: силы будут испытывать скачок, что не соответствует физике. 
-1. Чтобы избежать этого, можно приподнять потенциал так, чтобы убрать ступеньку в потенциальной энергии.
-Однако это приведет к тому, что поменяется энергетический баланс в системе и моделируемый потенциал будет сильно отличатся от реального. 
-1. Добавим дифференцируемую переходную функцию на некотором интервале $[r_c, r_i]$.
-Получается потенциал, не обладающий недостатками, указанными выше.
 
 ![Потенциал](images/fig6a.png)
 
-# Выводы
+# Other boundary conditions
 
-Чтобы запустить моделирование необходимо
-1. Задать систему:
-   1. выбрать объем, задать граничные условия
-   2. выбрать функции взаимодействия, которые будут использоваться для расчета сил
-   3. задать начальные условия
-2. Выбрать алгоритм, который будет рассчитывать эволюцию системы.
+1. **Open boundary conditions**.
+In this case, if a particle reaches a boundary, it will be removed from simulation. 
+Simulated particles have to be more or less stationary. 
+These conditions can be used to simulate, for example, single stable droplet of some liquid, but not to simulate fluid itself.
+However, vaporization of the droplet with time may negatively affect the result.
+1. **Vacuum**.
+These boundary conditions impose restrictions on the interpretation of the results. 
+They are used for modeling single particles, but in the experiment such particles will be in some solvent with which particles they interact.
+This leads to the fact that, for example, the spectrum of particles in the experiment will be different from that found numerically.
+Typical example of usage is system of enzyme with little water.
+1. **Fixed boundaries**.
+These are conditions under which particles are elastically pushed away from the boundaries.
+The limited volume of the system causes some effects. If fixed boundary conditions are used, there is an effective surface tension in the system, so this system becomes a nanodrop.
+In case of using periodic boundary conditions this does not happen.
+
+# Empirical potentials
+
+It is necessary to specify the potential energy in order to calculate the forces. In molecular dynamics, the potential energy is obtained semiempirically using experimental data and quantum mechanical calculations.
+
+Potential energy is the sum of potential energies of stretching, bending, torsion of interatomic bonds in a molecule, intermolecular interaction energies and intramolecular interaction energies.
+
+![Потенциалы](images/fig5.png)
+Levitt, M. (2001). The birth of computational structural biology. Nat. Struct. Biol., 8, 392–393. doi: 10.1038/87545
+
+# Neighbor list for short range interactions
+
+To check which particles interact, i.e. that the distance between them is less than $r_c$, it is needed to make $O(N^2)$ checks.
+To speed up the calculations, we can construct Verlet lists.
+For each particle a list of other particles that are closer than $r_c$ and a list of particles that are in some buffer layer $r_c<r<r_b$ are created. 
+At each step only the interactions between a particle and particles in its Verlet list are checked, and only once every several steps lists are reconstructed.
+The number of checks is reduced to $O(N)$.
+
+# Conclusion
+
+To run the simulation:
+1. setup the system:
+   1. choose the volume and its shape, set the boundary conditions
+   2. select the interaction potential to be used to calculate the force
+   3. set initial conditions
+2. choose a method that will calculate the evolution of the system over time.
