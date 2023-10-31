@@ -12,7 +12,8 @@ To display the formulas correctly, open the website on [GitHub pages](https://vs
 4. [Controlling temperature.](lectures/lecture4/lecture4.md)
 
 ## Practice
-1. [Simulations in HOOMD-blue. Velocity distribution.](https://nbviewer.org/github/vsevolodkleshchenko/MDcourse/blob/main/practice/MD_tutorial_and_velocity_distributions.ipynb)
+1. Symplectic integrators (Lecture 2) [[Colab](https://colab.research.google.com/github/vsevolodkleshchenko/MDcourse/blob/main/practice/practice2.ipynb), [nbviewer](https://nbviewer.org/github/vsevolodkleshchenko/MDcourse/blob/main/practice/practice2.ipynb)]
+2. Simulations in HOOMD-blue. Velocity distribution. [[Colab](https://colab.research.google.com/github/vsevolodkleshchenko/MDcourse/blob/main/practice/MD_tutorial_and_velocity_distributions.ipynb), [nbviewer](https://nbviewer.org/github/vsevolodkleshchenko/MDcourse/blob/main/practice/MD_tutorial_and_velocity_distributions.ipynb)]
 
 ## Literature
 1. D. Frenkel, B. Smit, Understanding Molecular Simulation, 2nd Edition, Academic Press, New York, 2001.
