@@ -6,16 +6,17 @@ Will any numerical scheme for ordinary differential equations preserve such fund
 To display the formulas correctly, open the website on [GitHub pages](https://vsevolodkleshchenko.github.io/MDcourse/).
 
 ## Lectures
-0. Some historical introduction.
-1. [Equations of motion.](lectures/lecture1/lecture1.md)
-2. [Numerical scheme in Liouville formalism.](lectures/lecture2/lecture2.md)
-3. [Potential energy, forces, boundary conditions.](lectures/lecture3/lecture3.md)
-4. [Controlling temperature.](lectures/lecture4/lecture4.md)
-5. Monte Carlo method.
-6. Practice notes.
+
+* **Lecture 0**. Some historical introduction.
+* **Lecture 1**. [Equations of motion.](lectures/lecture1/lecture1.md)
+* **Lecture 2**. [Numerical scheme in Liouville formalism.](lectures/lecture2/lecture2.md)
+* **Lecture 3**. [Potential energy, forces, boundary conditions.](lectures/lecture3/lecture3.md)
+* **Lecture 4**. [Controlling temperature.](lectures/lecture4/lecture4.md)
+* **Lecture 5**. Monte Carlo method.
+* **Lecture 6**. Practice notes.
 
 ## Practice
-1. Symplectic integrators (Lecture 2) [[Colab](https://colab.research.google.com/github/vsevolodkleshchenko/MDcourse/blob/main/practice/practice2.ipynb), [nbviewer](https://nbviewer.org/github/vsevolodkleshchenko/MDcourse/blob/main/practice/practice2.ipynb)]
+1. Symplectic integrators (see Lecture 2) [[Colab](https://colab.research.google.com/github/vsevolodkleshchenko/MDcourse/blob/main/practice/practice2.ipynb), [nbviewer](https://nbviewer.org/github/vsevolodkleshchenko/MDcourse/blob/main/practice/practice2.ipynb)]
 1. Simulations in HOOMD-blue. Velocity distribution. [[Colab](https://colab.research.google.com/github/vsevolodkleshchenko/MDcourse/blob/main/practice/MD_tutorial_and_velocity_distributions.ipynb), [nbviewer](https://nbviewer.org/github/vsevolodkleshchenko/MDcourse/blob/main/practice/MD_tutorial_and_velocity_distributions.ipynb)]
 
 ## Literature
