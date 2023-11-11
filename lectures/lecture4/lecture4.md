@@ -1,7 +1,7 @@
 # Lecture 4. Controlling temperature
 
 ## NVE and NVT ensembles
-Consider a system in which the interaction of particles is determined by forces $f(r_{ij})$. In this system there will be a constant number of particles $N$, the volume of the system $V$ and the energy $E$ (total isolation), i.e. `microcanonical ensemble`. The volume of the system will be taken into account using for example periodic boundary conditions.
+Consider a system in which the interaction of particles is determined by forces $f(r_{ij})$. In this system there will be a constant number of particles $N$, the volume of the system $V$ and the energy $E$ (total isolation), i.e. *microcanonical ensemble*. The volume of the system will be taken into account using for example periodic boundary conditions.
 
 For the Hamiltonian we can write:
 
@@ -24,7 +24,7 @@ $$
 
 where $x= \begin{pmatrix} r \\ p \end{pmatrix}$, $M$ - the number of time steps $\Delta t$.
 
-However, in the real system there is always a thermodynamic bath. Also, it is usually assumed that there is a smaller subsystem in some large system that exchanges heat with it, and as a result there is a temperature $T$. Therefore we would like to explicitly sample the `canonical ensemble` (NVT). For this purpose we need to be able to control the temperature of our
+However, in the real system there is always a thermodynamic bath. Also, it is usually assumed that there is a smaller subsystem in some large system that exchanges heat with it, and as a result there is a temperature $T$. Therefore we would like to explicitly sample the *canonical ensemble* (NVT). For this purpose we need to be able to control the temperature of our
 system.
 
 ## Velocity rescaling
@@ -49,7 +49,7 @@ $$
 \frac{3kT}2 = \frac{m\left<|v|^2\right>}2 \quad \rightarrow  \quad \left<p^2\right> = 3kTm, \left<p^4\right> = 15(kTm)^2
 $$
 
-If we want to keep the average speed, then we can do `velocity rescaling`. However, we should note, that as the result we may obtain another system with specified kinetic energy but wrong distribution.
+If we want to keep the average speed, then we can do *velocity rescaling*. However, we should note, that as the result we may obtain another system with specified kinetic energy but wrong distribution.
 
 The simplest way is to check the relative fluctuations of the square of the momentum $\frac{\sigma_{p^2}}{\left<p^2\right>^2}$ and total kinetic energy (kinetic temprature) $\frac{\sigma_{T_k}^2}{\left<T_k^2\right>^2}$.
 
@@ -79,12 +79,12 @@ If we need to control the temperature, it is necessary to take care that all the
 
 Thus, you can use only methods in which it is proved that everything remains correct.
 
-- `Isokinetic method`: the sum of squares is constant. This is not very good method, because if $\left<p^2\right> = 0$ then $\sigma_{T_k} = 0 $ 
+- *Isokinetic method*: the sum of squares is constant. This is not very good method, because if $\left<p^2\right> = 0$ then $\sigma_{T_k} = 0 $ 
 
 Further, there are better methods that can be conditionally divided into two classes:
 
-- Stochastic methods: In `Stochastic collisions` (`Anderson thermostat`) method periodically random impacts on molecules into the system are introduced. At some point, the momentum of some molecule changes, so that the distribution remains correct.
-- Extended methods: for example `Nose-Hoover thermostat`, where system samples not constant energy, but by distribution, while the dynamics are reserved.
+- Stochastic methods: In *Stochastic collisions* (*Anderson thermostat*) method periodically random impacts on molecules into the system are introduced. At some point, the momentum of some molecule changes, so that the distribution remains correct.
+- Extended methods: for example *Nose-Hoover thermostat*, where system samples not constant energy, but by distribution, while the dynamics are reserved.
 
 $$
 \delta(E-H(p, r)) \quad\rightarrow\quad \exp(-\frac{H(p(r))}{kT})
@@ -116,7 +116,7 @@ for i in range(1, N):
     if is_reached():
         v[i] = Gauss()  # Maxvell distribution
 ```
-where `is_reached` - is a function that determines has the value of $\nu\Delta t$ reached a sufficient value to apply the collision.
+where *is_reached* - is a function that determines has the value of $\nu\Delta t$ reached a sufficient value to apply the collision.
 
 Advantages:
 - Simple

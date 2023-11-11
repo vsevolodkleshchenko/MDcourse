@@ -1,4 +1,4 @@
-# Lecture 1
+# Lecture 1. Equations of motion
 
 Let's consider a system of a large number of particles and build a model for numerical simulation of its dynamics.
 

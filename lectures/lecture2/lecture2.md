@@ -1,4 +1,4 @@
-# Lecture 2
+# Lecture 2. Numerical scheme in Liouville formalism
 
 ## About the nature of equations
 
